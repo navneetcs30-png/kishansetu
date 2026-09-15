@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { GoogleGenAI } from '@google/genai';
 import { createServer as createViteServer } from 'vite';
 import { platformDb } from './src/server/db';
+import { supabaseService } from './src/server/supabaseService';
 
 dotenv.config();
 
@@ -425,6 +426,40 @@ app.get('/api/admin/db-status', (_req, res) => {
     res.json(platformDb.getDatabaseStats());
   } catch (err: any) {
     res.status(500).json({ error: 'Failed to read database statistics.' });
+  }
+});
+
+// ==========================================
+// ⚡ SUPABASE CLOUD DATABASE ENDPOINTS
+// ==========================================
+
+// 5. Inspect Supabase Cloud Connection & Sync Status
+app.get('/api/supabase/status', async (_req, res) => {
+  try {
+    const status = await supabaseService.getStatus();
+    res.json(status);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || 'Failed to retrieve Supabase status' });
+  }
+});
+
+// 6. Fetch Government MSP Rates (Supabase + local fallback)
+app.get('/api/data/msp-rates', async (_req, res) => {
+  try {
+    const result = await supabaseService.getMspRates();
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Failed to retrieve MSP benchmark rates.' });
+  }
+});
+
+// 7. Fetch Daily Mandi Vegetable Rates (Supabase + local fallback)
+app.get('/api/data/mandi-rates', async (_req, res) => {
+  try {
+    const result = await supabaseService.getMandiRates();
+    res.json(result);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Failed to retrieve mandi rates.' });
   }
 });
 

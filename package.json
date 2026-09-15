@@ -11,7 +11,7 @@
     "start": "node dist/server.js",
     "preview": "vite preview",
     "lint": "tsc --noEmit",
-    "test": "tsx tests/platformConfig.test.ts && tsx tests/adminAuthDb.test.ts",
+    "test": "tsx tests/platformConfig.test.ts && tsx tests/adminAuthDb.test.ts && tsx tests/supabaseService.test.ts",
     "dev:farmer": "npm --prefix farmer-dashboard run dev",
     "dev:consumer": "npm --prefix agridirect-consumer-dashboard run dev",
     "dev:bulk": "npm --prefix bulk-buyer-dashboard run dev",
@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@google/genai": "^2.4.0",
+    "@supabase/supabase-js": "^2.116.0",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",
     "dotenv": "^17.2.3",

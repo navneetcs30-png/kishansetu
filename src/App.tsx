@@ -22,7 +22,8 @@ import {
   AlertTriangle,
   Sun,
   Moon,
-  Lock
+  Lock,
+  Database
 } from 'lucide-react';
 
 // Sub-modules
@@ -32,6 +33,7 @@ import ConsumerApp from '../agridirect-consumer-dashboard/src/App';
 import BulkBuyerApp from '../bulk-buyer-dashboard/src/App';
 import AdminApp from '../admin-dashboard/src/App';
 import { AdminLoginGate } from './components/AdminLoginGate';
+import { SupabaseStatusModal } from './components/SupabaseStatusModal';
 
 // Services and types
 import { platformConfigService } from './services/platformConfig';
@@ -45,6 +47,7 @@ export default function App() {
   const [activeModule, setActiveModule] = useState<ModuleType>('auth');
   const [isPending, startTransition] = useTransition();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
 
   // Common Global Theme Mode State: 'light' | 'dark'
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -181,6 +184,15 @@ export default function App() {
             </span>
             <span className="font-semibold text-emerald-600 dark:text-emerald-400">KishanSetu Ecosystem Live:</span>
             <span className="text-slate-600 dark:text-slate-300 hidden sm:inline">5 Integrated Modules • Single Sign-On • Real-Time Mandi Feeds</span>
+            <button
+              type="button"
+              onClick={() => setIsSupabaseModalOpen(true)}
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 transition-all cursor-pointer shadow-xs ml-1"
+              title="Inspect Supabase Cloud Database & Connection Status"
+            >
+              <Database className="w-2.5 h-2.5" />
+              <span>Supabase Cloud</span>
+            </button>
           </div>
 
           <div className="flex items-center gap-3">
@@ -620,6 +632,12 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* Supabase Cloud Connection & Setup Diagnostic Modal */}
+      <SupabaseStatusModal
+        isOpen={isSupabaseModalOpen}
+        onClose={() => setIsSupabaseModalOpen(false)}
+      />
     </div>
   );
 }
