@@ -34,6 +34,7 @@ import BulkBuyerApp from '../bulk-buyer-dashboard/src/App';
 import AdminApp from '../admin-dashboard/src/App';
 import { AdminLoginGate } from './components/AdminLoginGate';
 import { SupabaseStatusModal } from './components/SupabaseStatusModal';
+import { LogoIntroSplash } from './components/LogoIntroSplash';
 
 // Services and types
 import { platformConfigService } from './services/platformConfig';
@@ -48,6 +49,7 @@ export default function App() {
   const [isPending, startTransition] = useTransition();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSupabaseModalOpen, setIsSupabaseModalOpen] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
 
   // Common Global Theme Mode State: 'light' | 'dark'
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -172,7 +174,11 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+    <>
+      {/* Animated Logo Intro Splash Screen */}
+      {showSplash && <LogoIntroSplash onComplete={() => setShowSplash(false)} />}
+
+      <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       {/* Top Persistent KishanSetu Platform Navigation Header */}
       <header className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white shadow-sm transition-colors duration-200">
         {/* Top Ecosystem Status Banner */}
@@ -192,6 +198,15 @@ export default function App() {
             >
               <Database className="w-2.5 h-2.5" />
               <span>Supabase Cloud</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowSplash(true)}
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 transition-all cursor-pointer shadow-xs ml-0.5"
+              title="Play KishanSetu Logo Intro Animation"
+            >
+              <Sparkles className="w-2.5 h-2.5 text-amber-500" />
+              <span className="hidden xs:inline">Replay Logo</span>
             </button>
           </div>
 
@@ -264,8 +279,15 @@ export default function App() {
         {/* Main Header Strip */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-4">
           {/* Brand Logo & Name */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => setActiveModule(currentUser ? (currentUser.role as ModuleType) : 'auth')}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white shadow-md">
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setActiveModule(currentUser ? (currentUser.role as ModuleType) : 'auth')}>
+            <div 
+              className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowSplash(true);
+              }}
+              title="Click to replay KishanSetu Logo Intro Animation"
+            >
               <Sprout className="w-6 h-6" />
             </div>
             <div>
@@ -639,5 +661,6 @@ export default function App() {
         onClose={() => setIsSupabaseModalOpen(false)}
       />
     </div>
+    </>
   );
 }
