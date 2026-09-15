@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "createdAt": "2026-09-15T12:42:43.991Z",
-  "updatedAt": "2026-09-15T17:39:21.518Z",
+  "updatedAt": "2026-09-15T17:49:04.993Z",
   "users": [
     {
       "id": "usr_admin_001",
@@ -9,8 +9,8 @@
       "email": "admin@kishansetu.in",
       "name": "Super Admin Devon Vance",
       "role": "admin",
-      "passwordHash": "e50e68cc4cfad6e7f508cb18f265618c03a1efe9cc67d369afd1a0e1b3c671ed2e0abeaa59a406d595540259b8c8c1aedb36761c0367934b0f5ae1cc5d53f7c3",
-      "salt": "de7bb89a17a64c6f285e9695ea8aacf4",
+      "passwordHash": "ec8adc5b0fae610ad37a2300f8d80b5d9fd896c4146961e5722837c7a0c65572999098f7508a163154aa38eab7fe10841b4747f47c9fcb84479e985c73d0f500",
+      "salt": "4d3def70cc65be606860e4c97d260e3f",
       "roleMeta": {
         "organization": "AgriPortal Central Security & Governance Council",
         "location": "Security Operations Center (SOC)",
@@ -19,8 +19,8 @@
       },
       "mfaEnabled": true,
       "createdAt": "2026-09-15T12:42:43.991Z",
-      "updatedAt": "2026-09-15T17:39:20.863Z",
-      "lastLogin": "2026-09-15T17:39:20.924Z"
+      "updatedAt": "2026-09-15T17:49:02.149Z",
+      "lastLogin": "2026-09-15T17:49:02.201Z"
     },
     {
       "id": "usr_farmer_001",
@@ -60,6 +60,13 @@
     }
   ],
   "sessions": [
+    {
+      "token": "ks_adm_sess_a3230ab42e13f713d6b0b9d6b2b5b4e1aaeb77bab6443286646e4740630d1e1e",
+      "userId": "usr_admin_001",
+      "role": "admin",
+      "createdAt": "2026-09-15T17:49:01.970Z",
+      "expiresAt": "2026-09-16T17:49:01.970Z"
+    },
     {
       "token": "ks_adm_sess_a89b4f993d0883bb224aa3cf3ed578d95a6758db2c1735985cec3b52964b8891",
       "userId": "usr_admin_001",
@@ -104,6 +111,110 @@
     }
   ],
   "auditLogs": [
+    {
+      "id": "log_1789494544992_0ebq",
+      "action": "TEST_EVENT",
+      "actor": "SYSTEM",
+      "timestamp": "2026-09-15T17:49:04.993Z",
+      "details": "Supabase test runner execution",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "log_1789494542202_4t9i",
+      "action": "ADMIN_LOGIN_SUCCESS",
+      "actor": "admin",
+      "timestamp": "2026-09-15T17:49:02.202Z",
+      "details": "Admin successfully authenticated against database",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "log_1789494542150_uziz",
+      "action": "ADMIN_CREDENTIALS_UPDATED",
+      "actor": "admin",
+      "timestamp": "2026-09-15T17:49:02.150Z",
+      "details": "Updated credentials in database. Username: admin, Password changed: true",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "log_1789494542103_f9a0",
+      "action": "ADMIN_LOGIN_FAILED",
+      "actor": "admin",
+      "timestamp": "2026-09-15T17:49:02.103Z",
+      "details": "Password mismatch for admin account",
+      "status": "FAILED"
+    },
+    {
+      "id": "log_1789494542060_uqgd",
+      "action": "ADMIN_LOGIN_SUCCESS",
+      "actor": "admin",
+      "timestamp": "2026-09-15T17:49:02.060Z",
+      "details": "Admin successfully authenticated against database",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "log_1789494542016_8j6c",
+      "action": "ADMIN_CREDENTIALS_UPDATED",
+      "actor": "admin",
+      "timestamp": "2026-09-15T17:49:02.016Z",
+      "details": "Updated credentials in database. Username: admin, Password changed: true",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "log_1789494541968_n32n",
+      "action": "ADMIN_ACCESS_DENIED",
+      "actor": "ramesh.farmer",
+      "timestamp": "2026-09-15T17:49:01.968Z",
+      "details": "User has role 'farmer' instead of 'admin'",
+      "status": "FAILED"
+    },
+    {
+      "id": "log_1789494541966_whg3",
+      "action": "ADMIN_LOGIN_FAILED",
+      "actor": "nonexistent_user",
+      "timestamp": "2026-09-15T17:49:01.966Z",
+      "details": "User ID or Email not found in database",
+      "status": "FAILED"
+    },
+    {
+      "id": "log_1789494541965_dnat",
+      "action": "ADMIN_LOGIN_FAILED",
+      "actor": "admin",
+      "timestamp": "2026-09-15T17:49:01.965Z",
+      "details": "Password mismatch for admin account",
+      "status": "FAILED"
+    },
+    {
+      "id": "log_1789494541917_59b2",
+      "action": "ADMIN_LOGIN_SUCCESS",
+      "actor": "admin",
+      "timestamp": "2026-09-15T17:49:01.917Z",
+      "details": "Admin successfully authenticated against database",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "log_1789494541872_sntg",
+      "action": "ADMIN_LOGIN_SUCCESS",
+      "actor": "admin",
+      "timestamp": "2026-09-15T17:49:01.872Z",
+      "details": "Admin successfully authenticated against database",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "log_1789494439668_cpyf",
+      "action": "TEST_EVENT",
+      "actor": "SYSTEM",
+      "timestamp": "2026-09-15T17:47:19.668Z",
+      "details": "Supabase test runner execution",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "log_1789494357220_pky9",
+      "action": "TEST_EVENT",
+      "actor": "SYSTEM",
+      "timestamp": "2026-09-15T17:45:57.220Z",
+      "details": "Supabase test runner execution",
+      "status": "SUCCESS"
+    },
     {
       "id": "log_1789493961518_n8aq",
       "action": "TEST_EVENT",

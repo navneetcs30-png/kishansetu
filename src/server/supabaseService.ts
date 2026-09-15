@@ -1,5 +1,33 @@
+import { Pool } from 'pg';
 import { getSupabaseClient, isSupabaseConfigured, checkSupabaseHealth } from '../services/supabaseClient';
-import { platformDb, DatabaseUser } from './db';
+import { platformDb } from './db';
+
+// Lazy initialized PostgreSQL connection pool for direct database connection
+let pgPool: Pool | null = null;
+
+function getPgPool(): Pool | null {
+  const connStr = process.env.DATABASE_URL;
+  if (!connStr) return null;
+
+  if (!pgPool) {
+    try {
+      pgPool = new Pool({
+        connectionString: connStr,
+        ssl: { rejectUnauthorized: false },
+        max: 10,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 10000,
+      });
+      pgPool.on('error', (err) => {
+        console.warn('⚠️ Supabase Postgres Pool error (non-fatal):', err.message);
+      });
+    } catch (e: any) {
+      console.warn('⚠️ Failed to initialize Postgres pool:', e.message);
+      pgPool = null;
+    }
+  }
+  return pgPool;
+}
 
 export interface FarmerVerificationRecord {
   id: string;
@@ -25,15 +53,54 @@ export class SupabaseDataService {
    * Retrieves overall database connection health & diagnostic metrics
    */
   public async getStatus() {
-    const health = await checkSupabaseHealth();
-    const localStats = platformDb.getDatabaseStats();
+    const timestamp = new Date().toISOString();
+    const pool = getPgPool();
 
+    // 1. First priority: Direct Postgres Connection Pool
+    if (pool) {
+      const start = Date.now();
+      try {
+        const res = await pool.query('SELECT NOW() as db_time, version() as version;');
+        const latencyMs = Date.now() - start;
+        return {
+          provider: 'SUPABASE_POSTGRESQL_CLOUD',
+          activeMode: 'Supabase Cloud Live (PostgreSQL 17)',
+          supabase: {
+            configured: true,
+            connected: true,
+            endpoint: 'db.zbwpvedsulwjzbejynqa.supabase.co:5432',
+            latencyMs,
+            serverTime: res.rows[0]?.db_time,
+            version: res.rows[0]?.version?.split(',')[0],
+            timestamp,
+          },
+          localDb: platformDb.getDatabaseStats(),
+          timestamp,
+        };
+      } catch (err: any) {
+        console.warn('⚠️ Direct Postgres health check failed, falling back:', err.message);
+      }
+    }
+
+    // 2. Second priority: Supabase JS Client
+    const health = await checkSupabaseHealth();
+    if (health.connected) {
+      return {
+        provider: 'SUPABASE_REST_CLOUD',
+        activeMode: 'Supabase Cloud Live (REST API)',
+        supabase: health,
+        localDb: platformDb.getDatabaseStats(),
+        timestamp,
+      };
+    }
+
+    // 3. Fallback: Local database
     return {
-      provider: health.connected ? 'SUPABASE_POSTGRES' : 'LOCAL_STORAGE_FALLBACK',
+      provider: 'LOCAL_STORAGE_FALLBACK',
+      activeMode: 'Local Offline Resilient',
       supabase: health,
-      localDb: localStats,
-      activeMode: health.connected ? 'Cloud (Supabase Live)' : 'Local Offline Resilient',
-      timestamp: new Date().toISOString(),
+      localDb: platformDb.getDatabaseStats(),
+      timestamp,
     };
   }
 
@@ -41,6 +108,18 @@ export class SupabaseDataService {
    * Fetch government MSP rates
    */
   public async getMspRates() {
+    const pool = getPgPool();
+    if (pool) {
+      try {
+        const { rows } = await pool.query('SELECT * FROM public.crops_msp ORDER BY crop_name ASC;');
+        if (rows && rows.length > 0) {
+          return { source: 'supabase_postgres', data: rows };
+        }
+      } catch (err: any) {
+        console.warn('⚠️ Postgres getMspRates query failed:', err.message);
+      }
+    }
+
     const client = getSupabaseClient(true);
     if (client) {
       try {
@@ -50,10 +129,10 @@ export class SupabaseDataService {
           .order('crop_name');
 
         if (!error && data && data.length > 0) {
-          return { source: 'supabase', data };
+          return { source: 'supabase_rest', data };
         }
       } catch (err) {
-        console.warn('⚠️ Supabase getMspRates query failed, returning local default:', err);
+        console.warn('⚠️ Supabase REST getMspRates query failed:', err);
       }
     }
 
@@ -76,6 +155,18 @@ export class SupabaseDataService {
    * Fetch wholesale vegetable mandi spot prices
    */
   public async getMandiRates() {
+    const pool = getPgPool();
+    if (pool) {
+      try {
+        const { rows } = await pool.query('SELECT * FROM public.mandi_rates ORDER BY commodity ASC;');
+        if (rows && rows.length > 0) {
+          return { source: 'supabase_postgres', data: rows };
+        }
+      } catch (err: any) {
+        console.warn('⚠️ Postgres getMandiRates query failed:', err.message);
+      }
+    }
+
     const client = getSupabaseClient(true);
     if (client) {
       try {
@@ -85,10 +176,10 @@ export class SupabaseDataService {
           .order('commodity');
 
         if (!error && data && data.length > 0) {
-          return { source: 'supabase', data };
+          return { source: 'supabase_rest', data };
         }
       } catch (err) {
-        console.warn('⚠️ Supabase getMandiRates query failed, returning local default:', err);
+        console.warn('⚠️ Supabase REST getMandiRates query failed:', err);
       }
     }
 
@@ -109,14 +200,15 @@ export class SupabaseDataService {
    * Record an audit event in Supabase or local log
    */
   public async recordAuditLog(action: string, actor: string, details: string, status: 'SUCCESS' | 'FAILED' | 'WARNING') {
-    const client = getSupabaseClient(true);
-    if (client) {
+    const pool = getPgPool();
+    if (pool) {
       try {
-        await client.from('audit_logs').insert([
-          { action, actor, details, status, created_at: new Date().toISOString() }
-        ]);
-      } catch (err) {
-        console.warn('⚠️ Supabase audit log insert error:', err);
+        await pool.query(
+          'INSERT INTO public.audit_logs (action, actor, details, status, created_at) VALUES ($1, $2, $3, $4, NOW());',
+          [action, actor, details, status]
+        );
+      } catch (err: any) {
+        console.warn('⚠️ Postgres audit log insert error:', err.message);
       }
     }
 

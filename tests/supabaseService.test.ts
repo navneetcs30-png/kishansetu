@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import { checkSupabaseHealth, isSupabaseConfigured, getSupabaseClient } from '../src/services/supabaseClient';
 import { supabaseService } from '../src/server/supabaseService';
 
@@ -48,6 +51,7 @@ async function runSupabaseTests() {
   console.log('\n======================================================');
   console.log('✅ ALL 6 SUPABASE RESILIENT INTEGRATION TESTS PASSED!');
   console.log('======================================================');
+  process.exit(0);
 }
 
 runSupabaseTests().catch((err) => {
