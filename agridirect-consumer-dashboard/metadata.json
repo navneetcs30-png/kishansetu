@@ -1,0 +1,6 @@
+{
+  "name": "AgriDirect Consumer Dashboard",
+  "description": "Responsive buyer dashboard for farm-fresh produce with live cart calculation, order tracking, storage guidance, and consumer schemes.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

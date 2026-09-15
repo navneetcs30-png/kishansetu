@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script>
+      // Defensive polyfill: Ensure window.fetch has both getter and setter in iframe environments
+      (function () {
+        try {
+          var _fetch = window.fetch;
+          Object.defineProperty(window, 'fetch', {
+            get: function () {
+              return _fetch;
+            },
+            set: function (val) {
+              _fetch = val;
+            },
+            configurable: true,
+            enumerable: true,
+          });
+
+          // Intercept future defineProperty on window.fetch that omit a setter
+          var origDefineProperty = Object.defineProperty;
+          Object.defineProperty = function (target, prop, desc) {
+            if ((target === window || (typeof Window !== 'undefined' && target === Window.prototype)) && prop === 'fetch') {
+              if (desc && typeof desc.get === 'function' && typeof desc.set !== 'function') {
+                var customVal;
+                var origGet = desc.get;
+                desc.set = function (newVal) {
+                  customVal = newVal;
+                };
+                desc.get = function () {
+                  return customVal !== undefined ? customVal : origGet.call(this);
+                };
+                desc.configurable = true;
+              }
+            }
+            return origDefineProperty.call(Object, target, prop, desc);
+          };
+        } catch (e) {
+          console.warn('Window fetch descriptor initialization notice:', e);
+        }
+      })();
+    </script>
+    <title>Farmer Dashboard</title>
+    <meta name="description" content="Responsive agricultural dashboard with crop MSP rates, vegetable mandi prices, production guidance, government schemes, farmer Aadhaar KYC verification desk, and Gemini AI assistant (Kisan Sahayak) for answering farming and page queries." />
+    <meta property="og:title" content="Farmer Dashboard" />
+    <meta property="og:description" content="Responsive agricultural dashboard with crop MSP rates, vegetable mandi prices, production guidance, government schemes, farmer Aadhaar KYC verification desk, and Gemini AI assistant (Kisan Sahayak) for answering farming and page queries." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body class="bg-[#f8f9fa] text-slate-800 antialiased selection:bg-emerald-100 selection:text-emerald-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

@@ -1,0 +1,7 @@
+{
+  "name": "Bulk Buyer Dashboard",
+  "description": "B2B wholesale agricultural procurement dashboard with tiered pricing, live contract tracking, sourcing guidance, and trade compliance.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

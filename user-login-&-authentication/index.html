@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>User Login & Authentication</title>
+    <meta name="description" content="Secure role-based authentication portal for Farmers, Consumers, Bulk Buyers, and Admin Access, featuring email sign-in, password strength meter, multi-factor verification (MFA/OTP), and password recovery." />
+    <meta property="og:title" content="User Login & Authentication" />
+    <meta property="og:description" content="Secure role-based authentication portal for Farmers, Consumers, Bulk Buyers, and Admin Access, featuring email sign-in, password strength meter, multi-factor verification (MFA/OTP), and password recovery." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      (function () {
+        try {
+          var target = typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : null);
+          if (target && target.fetch) {
+            var originalFetch = target.fetch.bind(target);
+            Object.defineProperty(target, 'fetch', {
+              get: function () {
+                return originalFetch;
+              },
+              set: function (newFetch) {
+                originalFetch = newFetch;
+              },
+              configurable: true,
+              enumerable: true,
+            });
+          }
+        } catch (_) {}
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

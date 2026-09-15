@@ -1,0 +1,291 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  h1, h2, h3, h4, .font-display {
+    font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
+  }
+
+  code, kbd, samp, pre {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.7);
+}
+
+/* Clean appearance for number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* ==========================================================================
+   Universal Light & Dark Mode Cross-Module Styles
+   ========================================================================== */
+
+/* --- 1. LIGHT MODE RULES FOR ADMIN CONSOLE & SUPER ADMIN CONTROL TOWER --- */
+html:not(.dark) .admin-dashboard-root {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .admin-dashboard-root .bg-slate-950 {
+  background-color: #f8fafc !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .admin-dashboard-root .bg-slate-900,
+html:not(.dark) .admin-dashboard-root .bg-slate-900\/60,
+html:not(.dark) .admin-dashboard-root .bg-slate-900\/80,
+html:not(.dark) .admin-dashboard-root .bg-slate-900\/90 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .admin-dashboard-root .bg-slate-950\/60,
+html:not(.dark) .admin-dashboard-root .bg-slate-950\/70,
+html:not(.dark) .admin-dashboard-root .bg-slate-950\/80 {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+}
+
+html:not(.dark) .admin-dashboard-root .border-slate-800,
+html:not(.dark) .admin-dashboard-root .border-slate-800\/80,
+html:not(.dark) .admin-dashboard-root .border-slate-700,
+html:not(.dark) .admin-dashboard-root .border-purple-900\/40,
+html:not(.dark) .admin-dashboard-root .border-purple-900\/30 {
+  border-color: #e2e8f0 !important;
+}
+
+html:not(.dark) .admin-dashboard-root .text-slate-100,
+html:not(.dark) .admin-dashboard-root .text-slate-200,
+html:not(.dark) .admin-dashboard-root .text-white {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .admin-dashboard-root .text-slate-400,
+html:not(.dark) .admin-dashboard-root .text-slate-300 {
+  color: #475569 !important;
+}
+
+html:not(.dark) .admin-dashboard-root input,
+html:not(.dark) .admin-dashboard-root select,
+html:not(.dark) .admin-dashboard-root textarea {
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+/* --- 2. DARK MODE RULES FOR BULK BUYER DASHBOARD --- */
+html.dark .bulk-buyer-dashboard-root {
+  background-color: #030712 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .bulk-buyer-dashboard-root #dashboard-header {
+  background-color: #090d16 !important;
+  border-color: #1e293b !important;
+}
+
+html.dark .bulk-buyer-dashboard-root [id$="-panel"] {
+  background-color: #0b1120 !important;
+  border-color: #1e293b !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Neutralize bright light gradients on panel headers in dark mode */
+html.dark .bulk-buyer-dashboard-root [class*="bg-linear-to-r"],
+html.dark .bulk-buyer-dashboard-root [class*="bg-gradient-to-r"],
+html.dark .bulk-buyer-dashboard-root [class*="from-blue-50"],
+html.dark .bulk-buyer-dashboard-root [class*="from-emerald-50"],
+html.dark .bulk-buyer-dashboard-root [class*="via-white"] {
+  background-image: none !important;
+  background-color: #0b1120 !important;
+}
+
+html.dark .bulk-buyer-dashboard-root .bg-slate-100,
+html.dark .bulk-buyer-dashboard-root .bg-slate-200 {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .bulk-buyer-dashboard-root .bg-slate-50 {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+}
+
+html.dark .bulk-buyer-dashboard-root .border-slate-200,
+html.dark .bulk-buyer-dashboard-root .border-slate-100 {
+  border-color: #1e293b !important;
+}
+
+html.dark .bulk-buyer-dashboard-root article {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+}
+
+html.dark .bulk-buyer-dashboard-root article:hover {
+  border-color: #334155 !important;
+}
+
+html.dark .bulk-buyer-dashboard-root h1,
+html.dark .bulk-buyer-dashboard-root h2,
+html.dark .bulk-buyer-dashboard-root h3,
+html.dark .bulk-buyer-dashboard-root h4,
+html.dark .bulk-buyer-dashboard-root .text-slate-900,
+html.dark .bulk-buyer-dashboard-root .text-slate-800 {
+  color: #f8fafc !important;
+}
+
+html.dark .bulk-buyer-dashboard-root .text-slate-700,
+html.dark .bulk-buyer-dashboard-root .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .bulk-buyer-dashboard-root .text-slate-500 {
+  color: #94a3b8 !important;
+}
+
+html.dark .bulk-buyer-dashboard-root input,
+html.dark .bulk-buyer-dashboard-root select,
+html.dark .bulk-buyer-dashboard-root textarea {
+  background-color: #111827 !important;
+  border-color: #374151 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .bulk-buyer-dashboard-root input::placeholder,
+html.dark .bulk-buyer-dashboard-root textarea::placeholder {
+  color: #64748b !important;
+}
+
+html.dark .bulk-buyer-dashboard-root [role="dialog"],
+html.dark .bulk-buyer-dashboard-root .bg-white.rounded-2xl,
+html.dark .bulk-buyer-dashboard-root .bg-white.rounded-xl {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+/* --- 3. DARK MODE RULES FOR AGRIDIRECT CONSUMER DASHBOARD --- */
+html.dark .consumer-dashboard-root {
+  background-color: #030712 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .consumer-dashboard-root header {
+  background-color: #090d16 !important;
+  border-color: #1e293b !important;
+}
+
+html.dark .consumer-dashboard-root [id$="-panel"] {
+  background-color: #0b1120 !important;
+  border-color: #1e293b !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark .consumer-dashboard-root [class*="bg-linear-to-r"],
+html.dark .consumer-dashboard-root [class*="bg-gradient-to-r"],
+html.dark .consumer-dashboard-root [class*="via-white"] {
+  background-image: none !important;
+  background-color: #0b1120 !important;
+}
+
+html.dark .consumer-dashboard-root .bg-stone-50,
+html.dark .consumer-dashboard-root .bg-stone-100,
+html.dark .consumer-dashboard-root .bg-stone-200 {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .consumer-dashboard-root .border-stone-200,
+html.dark .consumer-dashboard-root .border-stone-100,
+html.dark .consumer-dashboard-root .border-stone-300 {
+  border-color: #1e293b !important;
+}
+
+html.dark .consumer-dashboard-root article {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+}
+
+html.dark .consumer-dashboard-root article:hover {
+  border-color: #334155 !important;
+}
+
+html.dark .consumer-dashboard-root .divide-stone-100 > * {
+  border-color: #1e293b !important;
+}
+
+html.dark .consumer-dashboard-root h1,
+html.dark .consumer-dashboard-root h2,
+html.dark .consumer-dashboard-root h3,
+html.dark .consumer-dashboard-root h4,
+html.dark .consumer-dashboard-root .text-stone-900,
+html.dark .consumer-dashboard-root .text-stone-800 {
+  color: #f8fafc !important;
+}
+
+html.dark .consumer-dashboard-root .text-stone-700,
+html.dark .consumer-dashboard-root .text-stone-600 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .consumer-dashboard-root .text-stone-500,
+html.dark .consumer-dashboard-root .text-stone-400 {
+  color: #94a3b8 !important;
+}
+
+html.dark .consumer-dashboard-root input,
+html.dark .consumer-dashboard-root select,
+html.dark .consumer-dashboard-root textarea {
+  background-color: #111827 !important;
+  border-color: #374151 !important;
+  color: #f8fafc !important;
+}
+
+html.dark .consumer-dashboard-root input::placeholder,
+html.dark .consumer-dashboard-root textarea::placeholder {
+  color: #64748b !important;
+}
+
+html.dark .consumer-dashboard-root [role="dialog"],
+html.dark .consumer-dashboard-root .bg-white.rounded-2xl,
+html.dark .consumer-dashboard-root .bg-white.rounded-xl {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+  color: #f8fafc !important;
+}

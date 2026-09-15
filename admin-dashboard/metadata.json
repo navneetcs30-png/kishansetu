@@ -1,0 +1,6 @@
+{
+  "name": "Admin Dashboard",
+  "description": "Internal operations control center with user management, identity verification queues, operational guidance, and role-based access control.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

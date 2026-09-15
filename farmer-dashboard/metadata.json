@@ -1,0 +1,6 @@
+{
+  "name": "Farmer Dashboard",
+  "description": "Responsive agricultural dashboard with crop MSP rates, vegetable mandi prices, production guidance, government schemes, farmer Aadhaar KYC verification desk, and Gemini AI assistant (Kisan Sahayak) for answering farming and page queries.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

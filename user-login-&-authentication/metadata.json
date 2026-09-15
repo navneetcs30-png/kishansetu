@@ -1,0 +1,6 @@
+{
+  "name": "User Login & Authentication",
+  "description": "Secure role-based authentication portal for Farmers, Consumers, Bulk Buyers, and Admin Access, featuring email sign-in, password strength meter, multi-factor verification (MFA/OTP), and password recovery.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

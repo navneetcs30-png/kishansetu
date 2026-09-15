@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "allowJs": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@farmer/*": ["./farmer-dashboard/src/*"],
+      "@consumer/*": ["./agridirect-consumer-dashboard/src/*"],
+      "@bulk/*": ["./bulk-buyer-dashboard/src/*"],
+      "@admin/*": ["./admin-dashboard/src/*"],
+      "@auth/*": ["./user-login-&-authentication/src/*"]
+    },
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+  "include": [
+    "src",
+    "tests",
+    "server.ts",
+    "farmer-dashboard/src",
+    "agridirect-consumer-dashboard/src",
+    "bulk-buyer-dashboard/src",
+    "admin-dashboard/src",
+    "user-login-&-authentication/src"
+  ]
+}

@@ -1,0 +1,214 @@
+{
+  "version": "1.0.0",
+  "createdAt": "2026-09-15T12:42:43.991Z",
+  "updatedAt": "2026-09-15T13:11:14.909Z",
+  "users": [
+    {
+      "id": "usr_admin_001",
+      "username": "admin",
+      "email": "admin@kishansetu.in",
+      "name": "Super Admin Devon Vance",
+      "role": "admin",
+      "passwordHash": "2bdcddcd79584646dbecfcfd2dbfb7538cd6da08b206cce5a78322f515d584242f590de1f98069d42746ccda02a9e070910d040804c68ef07abee60139051722",
+      "salt": "57ad8bb1c8d3dd1a6eec62188b577594",
+      "roleMeta": {
+        "organization": "AgriPortal Central Security & Governance Council",
+        "location": "Security Operations Center (SOC)",
+        "badgeTitle": "Super Administrator",
+        "clearanceLevel": "Root Clearance (Level 5)"
+      },
+      "mfaEnabled": true,
+      "createdAt": "2026-09-15T12:42:43.991Z",
+      "updatedAt": "2026-09-15T12:42:44.782Z",
+      "lastLogin": "2026-09-15T13:11:14.904Z"
+    },
+    {
+      "id": "usr_farmer_001",
+      "username": "ramesh.farmer",
+      "email": "ramesh.farmer@agriportal.in",
+      "name": "Ramesh Patel",
+      "role": "farmer",
+      "passwordHash": "332f903108e8d8c12f1a968e10dab283af4c273a89dedfb1f9fec50aa30f36e3ae25ead9f07318e0158773f523fa81fcd86c9dece52d7fbf31a9a67725ccc88f",
+      "salt": "673ee1872bff3f17dcacdca752fd8540",
+      "mfaEnabled": true,
+      "createdAt": "2026-09-15T12:42:43.991Z",
+      "updatedAt": "2026-09-15T12:42:43.991Z"
+    },
+    {
+      "id": "usr_consumer_001",
+      "username": "priya.consumer",
+      "email": "priya.consumer@freshmart.in",
+      "name": "Priya Sharma",
+      "role": "consumer",
+      "passwordHash": "54aba4913837c113d7ecad3421cd4c94326e6dda7dcc3e6bc8885d3b53709a213e1df650d6a8818f968b4aa322edb2ad97ea28b287899721d6404b3fc7cb8d5f",
+      "salt": "4aa144d85df3f5af811b6f6b4f59afd1",
+      "mfaEnabled": true,
+      "createdAt": "2026-09-15T12:42:43.991Z",
+      "updatedAt": "2026-09-15T12:42:43.991Z"
+    },
+    {
+      "id": "usr_bulk_001",
+      "username": "vikram.bulkbuyer",
+      "email": "vikram.bulkbuyer@agritraders.com",
+      "name": "Vikram Singhania",
+      "role": "bulk_buyer",
+      "passwordHash": "769b8c8af419e51452f948d2918324b7b4c6f80dbc0db13bca6dc0c63390ab413108c7b2793653296d2b294dde51b4b1b6ea0c754db7a7e0b13e236c6fd9e018",
+      "salt": "0b052ac56da68097a090ace35b3c9897",
+      "mfaEnabled": true,
+      "createdAt": "2026-09-15T12:42:43.991Z",
+      "updatedAt": "2026-09-15T12:42:43.991Z"
+    }
+  ],
+  "sessions": [
+    {
+      "token": "ks_adm_sess_1d547c130ca4b6fa95bd0656568c994ac07df1e6b1604270b8e3f561efe8f87f",
+      "userId": "usr_admin_001",
+      "role": "admin",
+      "createdAt": "2026-09-15T13:11:14.909Z",
+      "expiresAt": "2026-09-16T13:11:14.909Z"
+    },
+    {
+      "token": "ks_adm_sess_fbf258a54ffcf61cc36ba44168d5ec7ebb6aea387a1fe7070d4c1bcab6d61766",
+      "userId": "usr_admin_001",
+      "role": "admin",
+      "createdAt": "2026-09-15T13:02:23.643Z",
+      "expiresAt": "2026-09-16T13:02:23.643Z"
+    },
+    {
+      "token": "ks_adm_sess_55d9072b999a96c7eb795897be7066a9266a2d46ce2ae0c7a83fa4df24e3f978",
+      "userId": "usr_admin_001",
+      "role": "admin",
+      "createdAt": "2026-09-15T12:52:16.227Z",
+      "expiresAt": "2026-09-16T12:52:16.227Z"
+    },
+    {
+      "token": "ks_adm_sess_b7d8d6ca5ac6ee36b785257e7b088ddcd43999e789dad32520489ca896189ccb",
+      "userId": "usr_admin_001",
+      "role": "admin",
+      "createdAt": "2026-09-15T12:42:44.524Z",
+      "expiresAt": "2026-09-16T12:42:44.524Z"
+    }
+  ],
+  "auditLogs": [
+    {
+      "id": "log_1789477874906_qpoq",
+      "action": "ADMIN_LOGIN_SUCCESS",
+      "actor": "admin",
+      "timestamp": "2026-09-15T13:11:14.906Z",
+      "details": "Admin successfully authenticated against database",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "log_1789477343641_e38z",
+      "action": "ADMIN_LOGIN_SUCCESS",
+      "actor": "admin",
+      "timestamp": "2026-09-15T13:02:23.641Z",
+      "details": "Admin successfully authenticated against database",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "log_1789476764100_zh0b",
+      "action": "ADMIN_LOGIN_FAILED",
+      "actor": "admin",
+      "timestamp": "2026-09-15T12:52:44.100Z",
+      "details": "Password mismatch for admin account",
+      "status": "FAILED"
+    },
+    {
+      "id": "log_1789476736225_8ibv",
+      "action": "ADMIN_LOGIN_SUCCESS",
+      "actor": "admin",
+      "timestamp": "2026-09-15T12:52:16.225Z",
+      "details": "Admin successfully authenticated against database",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "log_1789476164877_bf4i",
+      "action": "ADMIN_LOGIN_SUCCESS",
+      "actor": "admin",
+      "timestamp": "2026-09-15T12:42:44.877Z",
+      "details": "Admin successfully authenticated against database",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "log_1789476164783_mumd",
+      "action": "ADMIN_CREDENTIALS_UPDATED",
+      "actor": "admin",
+      "timestamp": "2026-09-15T12:42:44.783Z",
+      "details": "Updated credentials in database. Username: admin, Password changed: true",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "log_1789476164702_b5xd",
+      "action": "ADMIN_LOGIN_FAILED",
+      "actor": "admin",
+      "timestamp": "2026-09-15T12:42:44.702Z",
+      "details": "Password mismatch for admin account",
+      "status": "FAILED"
+    },
+    {
+      "id": "log_1789476164640_ercj",
+      "action": "ADMIN_LOGIN_SUCCESS",
+      "actor": "admin",
+      "timestamp": "2026-09-15T12:42:44.640Z",
+      "details": "Admin successfully authenticated against database",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "log_1789476164583_vitr",
+      "action": "ADMIN_CREDENTIALS_UPDATED",
+      "actor": "admin",
+      "timestamp": "2026-09-15T12:42:44.583Z",
+      "details": "Updated credentials in database. Username: admin, Password changed: true",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "log_1789476164523_rid5",
+      "action": "ADMIN_ACCESS_DENIED",
+      "actor": "ramesh.farmer",
+      "timestamp": "2026-09-15T12:42:44.523Z",
+      "details": "User has role 'farmer' instead of 'admin'",
+      "status": "FAILED"
+    },
+    {
+      "id": "log_1789476164522_9yho",
+      "action": "ADMIN_LOGIN_FAILED",
+      "actor": "nonexistent_user",
+      "timestamp": "2026-09-15T12:42:44.522Z",
+      "details": "User ID or Email not found in database",
+      "status": "FAILED"
+    },
+    {
+      "id": "log_1789476164521_si35",
+      "action": "ADMIN_LOGIN_FAILED",
+      "actor": "admin",
+      "timestamp": "2026-09-15T12:42:44.521Z",
+      "details": "Password mismatch for admin account",
+      "status": "FAILED"
+    },
+    {
+      "id": "log_1789476164459_0fws",
+      "action": "ADMIN_LOGIN_SUCCESS",
+      "actor": "admin",
+      "timestamp": "2026-09-15T12:42:44.459Z",
+      "details": "Admin successfully authenticated against database",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "log_1789476164397_q9ww",
+      "action": "ADMIN_LOGIN_SUCCESS",
+      "actor": "admin",
+      "timestamp": "2026-09-15T12:42:44.398Z",
+      "details": "Admin successfully authenticated against database",
+      "status": "SUCCESS"
+    },
+    {
+      "id": "log_1789476164301",
+      "action": "DATABASE_INITIALIZED",
+      "actor": "SYSTEM",
+      "timestamp": "2026-09-15T12:42:43.991Z",
+      "details": "Initialized persistent database with default admin credentials (username: admin)",
+      "status": "SUCCESS"
+    }
+  ]
+}
