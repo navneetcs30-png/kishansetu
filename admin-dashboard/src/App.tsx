@@ -49,6 +49,27 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: AdminApp
   const [activeMobileSection, setActiveMobileSection] = useState<string>('panel-users');
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [adminSection, setAdminSection] = useState<'control-tower' | 'grid' | 'users' | 'verifications' | 'roles' | 'guidance'>('control-tower');
+
+  // Listen to Global Voice Assistant Panel Selection Commands
+  useEffect(() => {
+    const handleVoicePanelSelect = (e: any) => {
+      const panel = e.detail?.panelId;
+      if (!panel) return;
+      if (panel === 'all' || panel === 'grid') {
+        setAdminSection('grid');
+      } else if (panel.includes('user')) {
+        setAdminSection('users');
+      } else if (panel.includes('verif')) {
+        setAdminSection('verifications');
+      } else if (panel.includes('role') || panel.includes('rbac')) {
+        setAdminSection('roles');
+      } else if (panel.includes('control') || panel.includes('tower')) {
+        setAdminSection('control-tower');
+      }
+    };
+    window.addEventListener('kishansetu_select_panel', handleVoicePanelSelect);
+    return () => window.removeEventListener('kishansetu_select_panel', handleVoicePanelSelect);
+  }, []);
   const [isCredentialsModalOpen, setIsCredentialsModalOpen] = useState<boolean>(false);
 
   // Modal States

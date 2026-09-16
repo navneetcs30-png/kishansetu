@@ -29,6 +29,7 @@ import { AdminLoginGate } from './components/AdminLoginGate';
 import { SupabaseStatusModal } from './components/SupabaseStatusModal';
 import { LogoIntroSplash } from './components/LogoIntroSplash';
 import { LanguageSelectionModal } from './components/LanguageSelectionModal';
+import { GlobalVoiceAssistant } from './components/GlobalVoiceAssistant';
 
 // Services and types
 import { platformConfigService } from './services/platformConfig';
@@ -642,6 +643,16 @@ function PlatformShell() {
         <SupabaseStatusModal
           isOpen={isSupabaseModalOpen}
           onClose={() => setIsSupabaseModalOpen(false)}
+        />
+
+        {/* Global AI Voice Chatbot & Platform Voice Navigation Assistant */}
+        <GlobalVoiceAssistant
+          activeModule={activeModule}
+          onNavigateModule={(mod: string) => setActiveModule(mod as ModuleType)}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+          onSetTheme={(nextTheme) => setTheme(nextTheme)}
+          onOpenLanguageModal={() => setIsLanguageModalOpen(true)}
         />
       </div>
     </>

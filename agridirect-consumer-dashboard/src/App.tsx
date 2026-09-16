@@ -58,6 +58,25 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: Consumer
   });
 
   const [activeSection, setActiveSection] = useState<string>('panel-produce');
+
+  // Listen to Global Voice Assistant Panel Selection Commands
+  useEffect(() => {
+    const handleVoicePanelSelect = (e: any) => {
+      const panel = e.detail?.panelId;
+      if (!panel) return;
+      if (panel.includes('order') || panel.includes('cart')) {
+        setActiveSection('panel-orders');
+      } else if (panel.includes('produce') || panel.includes('shop') || panel.includes('veg') || panel.includes('grain')) {
+        setActiveSection('panel-produce');
+      } else if (panel.includes('guidance')) {
+        setActiveSection('panel-guidance');
+      } else if (panel.includes('offer') || panel.includes('scheme')) {
+        setActiveSection('panel-offers');
+      }
+    };
+    window.addEventListener('kishansetu_select_panel', handleVoicePanelSelect);
+    return () => window.removeEventListener('kishansetu_select_panel', handleVoicePanelSelect);
+  }, []);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [selectedScheme, setSelectedScheme] = useState<ConsumerScheme | null>(null);
   const [viewingReceiptOrder, setViewingReceiptOrder] = useState<CustomerOrder | null>(null);

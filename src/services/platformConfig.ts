@@ -279,7 +279,7 @@ export const DEFAULT_PLATFORM_CONFIG: PlatformSuperAdminConfig = {
       dripIrrigationSubsidyPct: 55,
     },
     ai: {
-      modelName: 'gemini-3.8-flash',
+      modelName: 'gemini-2.5-flash',
       temperature: 0.7,
       fallbackKnowledgeEngineEnabled: true,
       systemInstructionOverride: 'You are Kisan Sahayak, official agricultural advisor for KishanSetu.',

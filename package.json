@@ -11,7 +11,7 @@
     "start": "node dist/server.js",
     "preview": "vite preview",
     "lint": "tsc --noEmit",
-    "test": "tsx tests/platformConfig.test.ts && tsx tests/adminAuthDb.test.ts && tsx tests/supabaseService.test.ts",
+    "test": "tsx tests/platformConfig.test.ts && tsx tests/adminAuthDb.test.ts && tsx tests/supabaseService.test.ts && tsx tests/voiceAssistant.test.ts",
     "dev:farmer": "npm --prefix farmer-dashboard run dev",
     "dev:consumer": "npm --prefix agridirect-consumer-dashboard run dev",
     "dev:bulk": "npm --prefix bulk-buyer-dashboard run dev",

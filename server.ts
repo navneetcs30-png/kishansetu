@@ -19,20 +19,22 @@ app.use(express.json({ limit: '10mb' }));
 
 // Lazy initialization for Gemini AI client
 let aiClient: GoogleGenAI | null = null;
-function getAIClient(): GoogleGenAI {
-  if (!aiClient) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      throw new Error('GEMINI_API_KEY environment variable is not configured. Please add it in .env or system environment.');
-    }
-    aiClient = new GoogleGenAI({
-      apiKey,
+function getAIClient(customApiKey?: string): GoogleGenAI {
+  const key = customApiKey || process.env.GEMINI_API_KEY;
+  if (!key) {
+    throw new Error('GEMINI_API_KEY environment variable is not configured. Please add it in .env or provide an API key in settings.');
+  }
+  if (!aiClient || customApiKey) {
+    const client = new GoogleGenAI({
+      apiKey: key,
       httpOptions: {
         headers: {
           'User-Agent': 'kishansetu-portal',
         },
       },
     });
+    if (!customApiKey) aiClient = client;
+    return client;
   }
   return aiClient;
 }
@@ -277,17 +279,30 @@ ${JSON.stringify(context, null, 2)}`;
       parts: [{ text: question }],
     });
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents,
-      config: {
-        systemInstruction,
-        temperature: 0.7,
-      },
-    });
+    let response;
+    try {
+      response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents,
+        config: {
+          systemInstruction,
+          temperature: 0.7,
+        },
+      });
+    } catch (modelErr: any) {
+      console.warn('Gemini 2.5 flash attempt failed, falling back to gemini-1.5-flash:', modelErr?.message);
+      response = await ai.models.generateContent({
+        model: 'gemini-1.5-flash',
+        contents,
+        config: {
+          systemInstruction,
+          temperature: 0.7,
+        },
+      });
+    }
 
     const reply = response.text || 'I could not generate an answer at this moment. Please try again.';
-    res.json({ reply });
+    res.json({ reply, source: 'gemini_cloud_live' });
   } catch (error: any) {
     console.error('Gemini API Error in /api/ai/ask, falling back to localized answer:', error);
     const fallbackReply = buildLocalizedDashboardAnswer(
@@ -295,7 +310,272 @@ ${JSON.stringify(context, null, 2)}`;
       req.body?.language || 'hi',
       req.body?.context || {}
     );
-    res.json({ reply: fallbackReply });
+    res.json({ reply: fallbackReply, source: 'localized_engine' });
+  }
+});
+
+// ==========================================
+// 🎙️ REAL-TIME VOICE COMMAND PARSING API
+// ==========================================
+
+export interface VoiceCommandResult {
+  action: 'NAVIGATE_MODULE' | 'FOCUS_PANEL' | 'SET_THEME' | 'SET_LANGUAGE' | 'OPEN_MODAL' | 'CALCULATE' | 'GENERAL';
+  target?: string;
+  speechReply: string;
+  displayText: string;
+  executed: boolean;
+  source?: string;
+}
+
+function parseLocalizedVoiceCommand(
+  transcript: string,
+  language: string = 'hi',
+  currentModule: string = 'farmer'
+): VoiceCommandResult {
+  const t = transcript.toLowerCase().trim();
+  const isHi = language === 'hi' || language === 'hinglish';
+  
+  // 1. Navigation Commands
+  if (t.includes('consumer') || t.includes('उपभोक्ता') || t.includes('खरीददारी') || t.includes('दुकान') || t.includes('store') || t.includes('shop')) {
+    return {
+      action: 'NAVIGATE_MODULE',
+      target: 'consumer',
+      speechReply: isHi ? 'उपभोक्ता स्टोर खोला जा रहा है। यहां आप ताजी सब्जियां और फल खरीद सकते हैं।' : 'Switching to Consumer Store. You can browse and order farm-fresh produce directly from farmers.',
+      displayText: isHi ? 'उपभोक्ता स्टोर पर नेविगेट किया गया' : 'Navigated to Consumer Store',
+      executed: true,
+      source: 'realtime_nlp_rule'
+    };
+  }
+  
+  if (t.includes('farmer') || t.includes('किसान') || t.includes('mandi') || t.includes('मंडी') || t.includes('खेती') || t.includes('फसल')) {
+    return {
+      action: 'NAVIGATE_MODULE',
+      target: 'farmer',
+      speechReply: isHi ? 'किसान हब खोला जा रहा है। यहां आप सरकारी समर्थन मूल्य और मंडी के ताजा भाव देख सकते हैं।' : 'Switching to Farmer Hub. You can view official MSP rates, Mandi benchmarks, and farming guidance.',
+      displayText: isHi ? 'किसान हब पर नेविगेट किया गया' : 'Navigated to Farmer Hub',
+      executed: true,
+      source: 'realtime_nlp_rule'
+    };
+  }
+
+  if (t.includes('bulk') || t.includes('थोक') || t.includes('procurement') || t.includes('खरीदार') || t.includes('b2b') || t.includes('व्यापारी')) {
+    return {
+      action: 'NAVIGATE_MODULE',
+      target: 'bulk_buyer',
+      speechReply: isHi ? 'थोक खरीदार डेस्क खोला जा रहा है। यहां बड़े पैमाने पर खरीद और अनुबंध किए जा सकते हैं।' : 'Opening B2B Bulk Buyer Desk. Manage high-volume institutional procurement contracts.',
+      displayText: isHi ? 'थोक खरीदार डेस्क पर नेविगेट किया गया' : 'Navigated to B2B Bulk Buyer Desk',
+      executed: true,
+      source: 'realtime_nlp_rule'
+    };
+  }
+
+  if (t.includes('admin') || t.includes('एडमिन') || t.includes('प्रशासन') || t.includes('कंसोल') || t.includes('control tower')) {
+    return {
+      action: 'NAVIGATE_MODULE',
+      target: 'admin',
+      speechReply: isHi ? 'प्रशासन कंसोल खोला जा रहा है। सुपर एडमिन नियंत्रण केंद्र में आपका स्वागत है।' : 'Opening Admin Console. Welcome to the Super Admin Governance Center.',
+      displayText: isHi ? 'प्रशासन कंसोल पर नेविगेट किया गया' : 'Navigated to Admin Console',
+      executed: true,
+      source: 'realtime_nlp_rule'
+    };
+  }
+
+  // 2. Theme Commands
+  if (t.includes('dark') || t.includes('डार्क') || t.includes('रात') || t.includes('black') || t.includes('काला')) {
+    return {
+      action: 'SET_THEME',
+      target: 'dark',
+      speechReply: isHi ? 'डार्क मोड सक्रिय कर दिया गया है।' : 'Dark mode has been enabled.',
+      displayText: isHi ? 'डार्क मोड सक्रिय' : 'Dark Mode Enabled',
+      executed: true,
+      source: 'realtime_nlp_rule'
+    };
+  }
+
+  if (t.includes('light') || t.includes('लाइट') || t.includes('ब्राइट') || t.includes('उजाला') || t.includes('white') || t.includes('दिन')) {
+    return {
+      action: 'SET_THEME',
+      target: 'light',
+      speechReply: isHi ? 'लाइट मोड सक्रिय कर दिया गया है।' : 'Light mode has been enabled.',
+      displayText: isHi ? 'लाइट मोड सक्रिय' : 'Light Mode Enabled',
+      executed: true,
+      source: 'realtime_nlp_rule'
+    };
+  }
+
+  // 3. Language Commands
+  if (t.includes('भाषा') || t.includes('language') || t.includes('बोली')) {
+    if (t.includes('english') || t.includes('अंग्रेजी')) {
+      return { action: 'SET_LANGUAGE', target: 'en', speechReply: 'Language switched to English.', displayText: 'Language: English', executed: true, source: 'realtime_nlp_rule' };
+    }
+    if (t.includes('hindi') || t.includes('हिन्दी')) {
+      return { action: 'SET_LANGUAGE', target: 'hi', speechReply: 'भाषा हिन्दी में बदल दी गई है।', displayText: 'भाषा: हिन्दी', executed: true, source: 'realtime_nlp_rule' };
+    }
+    if (t.includes('punjabi') || t.includes('पंजाबी')) {
+      return { action: 'SET_LANGUAGE', target: 'pa', speechReply: 'ਭਾਸ਼ਾ ਪੰਜਾਬੀ ਵਿੱਚ ਬਦਲ ਦਿੱਤੀ ਗਈ ਹੈ।', displayText: 'ਭਾਸ਼ਾ: ਪੰਜਾਬੀ', executed: true, source: 'realtime_nlp_rule' };
+    }
+    return {
+      action: 'OPEN_MODAL',
+      target: 'language',
+      speechReply: isHi ? 'भाषा चयन मेनू खोला जा रहा है।' : 'Opening language selection menu.',
+      displayText: isHi ? 'भाषा मेनू खोला गया' : 'Language Menu Opened',
+      executed: true,
+      source: 'realtime_nlp_rule'
+    };
+  }
+
+  // 4. Panel Specific Commands
+  if (t.includes('wheat') || t.includes('गेहूं') || t.includes('msp') || t.includes('समर्थन मूल्य') || t.includes('अनाज')) {
+    return {
+      action: 'FOCUS_PANEL',
+      target: 'grain',
+      speechReply: isHi ? 'गेहूं का सरकारी समर्थन मूल्य ₹2,275 प्रति क्विंटल है। 1 क्विंटल 100 किलोग्राम का होता है।' : 'Official MSP for Wheat is ₹2,275 per quintal (100 kg). Opening Grain & Crop Rates panel.',
+      displayText: isHi ? 'गेहूं समर्थन मूल्य: ₹2,275 / क्विंटल' : 'Wheat MSP: ₹2,275 / Quintal',
+      executed: true,
+      source: 'realtime_nlp_rule'
+    };
+  }
+
+  if (t.includes('vegetable') || t.includes('सब्जी') || t.includes('आलू') || t.includes('प्याज') || t.includes('टमाटर') || t.includes('potato') || t.includes('onion') || t.includes('tomato')) {
+    return {
+      action: 'FOCUS_PANEL',
+      target: 'vegetable',
+      speechReply: isHi ? 'सब्जी मंडी भाव: आलू ₹1,450, प्याज ₹2,100, टमाटर ₹1,850 प्रति क्विंटल। सब्जी बाजार पैनल दिखाया जा रहा है।' : 'Mandi Rates: Potato ₹1,450/Q, Onion ₹2,100/Q, Tomato ₹1,850/Q. Focusing on Vegetable Market panel.',
+      displayText: isHi ? 'सब्जी मंडी भाव पैनल दिखाया गया' : 'Vegetable Mandi Panel Focused',
+      executed: true,
+      source: 'realtime_nlp_rule'
+    };
+  }
+
+  if (t.includes('order') || t.includes('ऑर्डर') || t.includes('tracking') || t.includes('डिलीवरी')) {
+    return {
+      action: 'FOCUS_PANEL',
+      target: 'orders',
+      speechReply: isHi ? 'उपभोक्ता स्टोर के ऑर्डर और ट्रैकिंग पैनल पर ले जाया जा रहा है।' : 'Opening My Orders and Live Tracking panel.',
+      displayText: isHi ? 'माई ऑर्डर्स पैनल खोला गया' : 'My Orders Panel Opened',
+      executed: true,
+      source: 'realtime_nlp_rule'
+    };
+  }
+
+  if (t.includes('contract') || t.includes('अनुबंध') || t.includes('टेंडर')) {
+    return {
+      action: 'FOCUS_PANEL',
+      target: 'contracts',
+      speechReply: isHi ? 'सक्रिय अनुबंध और थोक खरीद समझौते दिखाए जा रहे हैं।' : 'Focusing on Active Contracts in Bulk Buyer Desk.',
+      displayText: isHi ? 'सक्रिय अनुबंध पैनल' : 'Active Contracts Focused',
+      executed: true,
+      source: 'realtime_nlp_rule'
+    };
+  }
+
+  if (t.includes('grid') || t.includes('ग्रिड') || t.includes('सभी पैनल') || t.includes('all panel')) {
+    return {
+      action: 'FOCUS_PANEL',
+      target: 'grid',
+      speechReply: isHi ? 'सभी 4 पैनल 2×2 ग्रिड व्यू में दिखाए जा रहे हैं।' : 'Showing all panels in balanced 2×2 grid layout.',
+      displayText: isHi ? '2×2 ग्रिड व्यू' : '2×2 Grid View Enabled',
+      executed: true,
+      source: 'realtime_nlp_rule'
+    };
+  }
+
+  // 5. Help / Capabilities
+  if (t.includes('help') || t.includes('मदद') || t.includes('सहायता') || t.includes('क्या कर सकते हो') || t.includes('commands') || t.includes('कमांड')) {
+    return {
+      action: 'GENERAL',
+      speechReply: isHi
+        ? 'आप बोलकर कह सकते हैं: "उपभोक्ता स्टोर खोलो", "किसान हब खोलो", "डार्क मोड ऑन करो", "गेहूं का भाव बताओ", या "सब्जी मंडी भाव दिखाओ"।'
+        : 'You can say: "Open Consumer Store", "Go to Farmer Hub", "Enable Dark Mode", "What is wheat MSP", or "Show vegetable mandi rates".',
+      displayText: isHi ? 'उपलब्ध वॉयस कमांड्स: "उपभोक्ता स्टोर खोलो", "किसान हब", "डार्क मोड", "गेहूं भाव", "मंडी भाव"' : 'Available commands: "Open Consumer Store", "Go to Farmer Hub", "Enable Dark Mode", "What is wheat MSP"',
+      executed: false,
+      source: 'realtime_nlp_rule'
+    };
+  }
+
+  // 6. General Agricultural / Platform Query Fallback
+  const generalReply = buildLocalizedDashboardAnswer(transcript, language, {});
+  return {
+    action: 'GENERAL',
+    speechReply: generalReply.split('\n\n')[0].replace(/[*#]/g, ''),
+    displayText: generalReply,
+    executed: false,
+    source: 'realtime_nlp_rule'
+  };
+}
+
+app.post('/api/ai/voice-command', async (req, res) => {
+  try {
+    const { transcript, language = 'hi', currentModule = 'farmer', apiKey } = req.body;
+
+    if (!transcript || typeof transcript !== 'string') {
+      res.status(400).json({ error: 'A valid voice transcript is required.' });
+      return;
+    }
+
+    const customKey = apiKey || req.headers['x-gemini-key'] as string || process.env.GEMINI_API_KEY;
+    
+    // First, test if command is an immediate local navigation / control intent
+    const localResult = parseLocalizedVoiceCommand(transcript, language, currentModule);
+    if (localResult.executed) {
+      res.json(localResult);
+      return;
+    }
+
+    // If not an exact navigation rule and custom/env key is available, call Gemini real-time API
+    if (customKey) {
+      try {
+        const ai = getAIClient(customKey);
+        const prompt = `You are the real-time AI voice assistant for "KishanSetu" Agricultural platform.
+The user spoke this voice command in language "${language}": "${transcript}".
+
+Analyze if this is an action command or a question.
+Return ONLY valid JSON matching this schema:
+{
+  "action": "NAVIGATE_MODULE" | "FOCUS_PANEL" | "SET_THEME" | "SET_LANGUAGE" | "OPEN_MODAL" | "GENERAL",
+  "target": string (optional: "farmer", "consumer", "bulk_buyer", "admin", "dark", "light", "hi", "en", "grain", "vegetable", "orders", "contracts", "grid"),
+  "speechReply": string (a short, warm, spoken audio reply in "${language}" suitable for Text-to-Speech),
+  "displayText": string (a helpful formatted display answer)
+}`;
+
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.5-flash',
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          config: {
+            responseMimeType: 'application/json',
+            temperature: 0.3,
+          },
+        });
+
+        if (response.text) {
+          try {
+            const parsed = JSON.parse(response.text);
+            res.json({
+              ...parsed,
+              executed: parsed.action !== 'GENERAL',
+              source: 'gemini_cloud_live'
+            });
+            return;
+          } catch (e) {
+            // fallback to local result
+          }
+        }
+      } catch (geminiErr: any) {
+        console.warn('Gemini cloud voice command execution notice:', geminiErr?.message);
+      }
+    }
+
+    // Return the high-speed local NLP result
+    res.json(localResult);
+  } catch (err: any) {
+    console.error('Error in /api/ai/voice-command:', err);
+    res.status(500).json({
+      action: 'GENERAL',
+      speechReply: 'क्षमा करें, आदेश समझने में त्रुटि हुई। कृपया पुनः बोलें।',
+      displayText: 'Voice command processing error. Please try again.',
+      executed: false,
+      source: 'error_fallback'
+    });
   }
 });
 

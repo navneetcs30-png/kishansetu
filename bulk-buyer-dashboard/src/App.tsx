@@ -89,6 +89,30 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: BulkBuye
   const [desktopLayout, setDesktopLayout] = useState<'grid' | 'tabs'>('tabs');
   const [focusedTab, setFocusedTab] = useState<'procurement' | 'contracts' | 'guidance' | 'compliance'>('procurement');
 
+  // Listen to Global Voice Assistant Panel Selection Commands
+  useEffect(() => {
+    const handleVoicePanelSelect = (e: any) => {
+      const panel = e.detail?.panelId;
+      if (!panel) return;
+      if (panel === 'all' || panel === 'grid') {
+        setDesktopLayout('grid');
+      } else {
+        setDesktopLayout('tabs');
+        if (panel.includes('procurement') || panel.includes('quote') || panel.includes('grain')) {
+          setFocusedTab('procurement');
+        } else if (panel.includes('contract') || panel.includes('order')) {
+          setFocusedTab('contracts');
+        } else if (panel.includes('compliance') || panel.includes('kyc')) {
+          setFocusedTab('compliance');
+        } else if (panel.includes('guidance')) {
+          setFocusedTab('guidance');
+        }
+      }
+    };
+    window.addEventListener('kishansetu_select_panel', handleVoicePanelSelect);
+    return () => window.removeEventListener('kishansetu_select_panel', handleVoicePanelSelect);
+  }, []);
+
   // Toast feedback
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
 

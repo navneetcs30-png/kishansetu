@@ -76,6 +76,27 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
   // Active panel visibility: 'panel-grains' | 'panel-vegetables' | 'panel-guidance' | 'panel-schemes' | 'all'
   const [activePanel, setActivePanel] = useState<string>('panel-grains');
 
+  // Listen to Global Voice Assistant Panel Selection Commands
+  useEffect(() => {
+    const handleVoicePanelSelect = (e: any) => {
+      const panel = e.detail?.panelId;
+      if (!panel) return;
+      if (panel === 'all') {
+        setActivePanel('all');
+      } else if (panel.includes('grain') || panel.includes('msp') || panel.includes('wheat')) {
+        setActivePanel('panel-grains');
+      } else if (panel.includes('veg') || panel.includes('onion') || panel.includes('potato')) {
+        setActivePanel('panel-vegetables');
+      } else if (panel.includes('guidance')) {
+        setActivePanel('panel-guidance');
+      } else if (panel.includes('scheme')) {
+        setActivePanel('panel-schemes');
+      }
+    };
+    window.addEventListener('kishansetu_select_panel', handleVoicePanelSelect);
+    return () => window.removeEventListener('kishansetu_select_panel', handleVoicePanelSelect);
+  }, []);
+
   // Modal visibility
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState<boolean>(false);
 

@@ -315,14 +315,27 @@ FORMATTING RULES:
       parts: [{ text: question }],
     });
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents,
-      config: {
-        systemInstruction,
-        temperature: 0.7,
-      },
-    });
+    let response;
+    try {
+      response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents,
+        config: {
+          systemInstruction,
+          temperature: 0.7,
+        },
+      });
+    } catch (modelErr: any) {
+      console.warn('Gemini 2.5-flash unavailable, falling back to gemini-1.5-flash:', modelErr?.message);
+      response = await ai.models.generateContent({
+        model: 'gemini-1.5-flash',
+        contents,
+        config: {
+          systemInstruction,
+          temperature: 0.7,
+        },
+      });
+    }
 
     const reply = response.text || 'I could not generate an answer at this moment. Please try again.';
     res.json({ reply });
