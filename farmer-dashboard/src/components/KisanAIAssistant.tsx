@@ -376,6 +376,22 @@ export const KisanAIAssistant: React.FC<KisanAIAssistantProps> = ({
     }
   }, [isOpen]);
 
+  // Synchronize with global platform language selection
+  useEffect(() => {
+    const handleLangChange = (e: any) => {
+      const lang = e.detail?.language;
+      if (lang && SUPPORTED_LANGUAGES.some((l) => l.code === lang)) {
+        handleSelectLanguage(lang);
+      }
+    };
+    const saved = localStorage.getItem('kishansetu_language') as SupportedLanguage;
+    if (saved && SUPPORTED_LANGUAGES.some((l) => l.code === saved)) {
+      setSelectedLanguage(saved);
+    }
+    window.addEventListener('kishansetu_language_changed', handleLangChange);
+    return () => window.removeEventListener('kishansetu_language_changed', handleLangChange);
+  }, []);
+
   // Handle language switch
   const handleSelectLanguage = (langCode: SupportedLanguage) => {
     setSelectedLanguage(langCode);

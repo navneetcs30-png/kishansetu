@@ -450,17 +450,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
         onToggle={() => setIsAIAssistantOpen((prev) => !prev)}
       />
 
-      {/* Footer */}
-      <footer className="bg-slate-100 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-6 text-center text-xs text-slate-500 dark:text-slate-400 px-4 transition-colors">
-        <div className="max-w-4xl mx-auto space-y-1.5">
-          <p className="font-semibold text-slate-700 dark:text-slate-200">
-            Farmer Dashboard & Kisan Document Verification Portal • Government of India
-          </p>
-          <p className="text-[11px] text-slate-500 dark:text-slate-400">
-            Rates are illustrative benchmarks for planning and calculation. Official document verification is processed in accordance with UIDAI and Ministry of Agriculture & Farmers Welfare guidelines.
-          </p>
-        </div>
-      </footer>
+
     </div>
   );
 }

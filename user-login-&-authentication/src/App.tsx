@@ -118,7 +118,7 @@ export default function App({
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
       {/* Top Navigation Bar */}
-      <header className="border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur sticky top-0 z-40">
+      <header className="border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-15 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center shadow-sm">
@@ -262,10 +262,7 @@ export default function App({
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-slate-200/70 dark:border-slate-800/70 py-4 px-6 text-center text-xs text-slate-400">
-        <p>Enterprise Authentication Safeguards • FIDO2 & TOTP Compliant • Zero Knowledge Cryptography</p>
-      </footer>
+
 
       {/* Virtual Security Inbox Drawer for preview testability */}
       <VirtualInboxDrawer />
