@@ -28,17 +28,20 @@ export const LoginForm: React.FC<Props> = ({
   const [lockoutTimer, setLockoutTimer] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Sync role if user enters an email that belongs to another registered role
+  const [suggestedRole, setSuggestedRole] = useState<UserRole | null>(null);
+
+  // Detect if entered email belongs to another role without silently auto-switching
   useEffect(() => {
     const trimmed = email.trim().toLowerCase();
+    if (!trimmed) {
+      setSuggestedRole(null);
+      return;
+    }
     const foundUser = authService.findUserByEmail(trimmed);
     if (foundUser && foundUser.role && foundUser.role !== selectedRole) {
-      setSelectedRole(foundUser.role);
+      setSuggestedRole(foundUser.role);
     } else {
-      const demoMatch = DEMO_ROLE_ACCOUNTS.find((d) => d.email.toLowerCase() === trimmed);
-      if (demoMatch && demoMatch.role !== selectedRole) {
-        setSelectedRole(demoMatch.role);
-      }
+      setSuggestedRole(null);
     }
   }, [email, selectedRole]);
 
@@ -73,6 +76,7 @@ export const LoginForm: React.FC<Props> = ({
   const handleSelectRole = (role: UserRole) => {
     setSelectedRole(role);
     setErrorMsg(null);
+    setSuggestedRole(null);
   };
 
   const handleApplyCredentials = (demoEmail: string, demoPass: string, role: UserRole) => {
@@ -80,6 +84,15 @@ export const LoginForm: React.FC<Props> = ({
     setEmail(demoEmail);
     setPassword(demoPass);
     setErrorMsg(null);
+    setSuggestedRole(null);
+  };
+
+  const handleSwitchToSuggestedRole = () => {
+    if (suggestedRole) {
+      setSelectedRole(suggestedRole);
+      setErrorMsg(null);
+      setSuggestedRole(null);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -124,7 +137,20 @@ export const LoginForm: React.FC<Props> = ({
         return;
       }
 
-      // Successful credentials, reset failed attempts
+      // STRICT ROLE VALIDATION: Users can only login with their designated role
+      if (user.role !== selectedRole) {
+        setSuggestedRole(user.role);
+        setErrorMsg(
+          `Role Mismatch: This account is registered as a ${ROLE_CONFIGS[user.role].label}, not a ${ROLE_CONFIGS[selectedRole].label}. You can only sign in through the ${ROLE_CONFIGS[user.role].label} portal.`
+        );
+        authService.addLog({
+          type: 'login_failed',
+          details: `Access denied: Account ${trimmedEmail} has role '${user.role}' but tried logging in through '${selectedRole}' portal.`,
+        });
+        return;
+      }
+
+      // Successful credentials & role matched, reset failed attempts
       setFailedAttempts(0);
       onSuccessCredentials(user);
     }, 500);
@@ -174,9 +200,21 @@ export const LoginForm: React.FC<Props> = ({
 
       {/* General Error Banner */}
       {errorMsg && lockoutTimer === 0 && (
-        <div className="mb-4 p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-800 dark:text-rose-200 text-xs flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-          <span>{errorMsg}</span>
+        <div className="mb-4 p-3 rounded-lg bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-rose-800 dark:text-rose-200 text-xs flex flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+            <span className="flex-1 font-medium">{errorMsg}</span>
+          </div>
+          {suggestedRole && (
+            <button
+              type="button"
+              onClick={handleSwitchToSuggestedRole}
+              className="self-start inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-rose-600 hover:bg-rose-700 text-white font-bold text-[11px] transition shadow-xs cursor-pointer"
+            >
+              <span>Switch to {ROLE_CONFIGS[suggestedRole].label} Portal</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
       )}
 

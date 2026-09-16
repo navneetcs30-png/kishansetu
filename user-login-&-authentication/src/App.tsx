@@ -23,7 +23,7 @@ export default function App({
   initialUser,
   initialView = 'login'
 }: AuthAppProps = {}) {
-  const [view, setView] = useState<AuthView>(initialUser ? 'dashboard' : initialView);
+  const [view, setView] = useState<AuthView>(initialView);
   const [pendingUser, setPendingUser] = useState<UserAccount | null>(null);
   const [authenticatedUser, setAuthenticatedUser] = useState<UserAccount | null>(initialUser || null);
   const [recoveryEmail, setRecoveryEmail] = useState<string>('');
@@ -33,9 +33,16 @@ export default function App({
   useEffect(() => {
     if (initialUser) {
       setAuthenticatedUser(initialUser);
-      setView('dashboard');
+      if (initialView === 'dashboard') {
+        setView('dashboard');
+      }
+    } else {
+      setAuthenticatedUser(null);
+      if (initialView === 'login') {
+        setView('login');
+      }
     }
-  }, [initialUser]);
+  }, [initialUser, initialView]);
 
   // Check URL hash for magic link reset tokens
   useEffect(() => {
@@ -67,10 +74,14 @@ export default function App({
     } else {
       authService.recordLogin(user);
       setAuthenticatedUser(user);
-      setView('dashboard');
       showBanner(`Welcome back, ${user.name}!`);
       if (onLoginSuccess) {
         onLoginSuccess(user);
+      }
+      if (onNavigateDashboard) {
+        onNavigateDashboard(user.role);
+      } else {
+        setView('dashboard');
       }
     }
   };
@@ -79,18 +90,30 @@ export default function App({
   const handleSuccessMfa = (user: UserAccount) => {
     setPendingUser(null);
     setAuthenticatedUser(user);
-    setView('dashboard');
     showBanner(`Authentication successful. Welcome, ${user.name}!`);
     if (onLoginSuccess) {
       onLoginSuccess(user);
+    }
+    if (onNavigateDashboard) {
+      onNavigateDashboard(user.role);
+    } else {
+      setView('dashboard');
     }
   };
 
   // Registration complete
   const handleSuccessRegister = (user: UserAccount) => {
-    showBanner(`Account created! Multi-factor verification setup complete.`);
-    setPendingUser(user);
-    setView('mfa-challenge');
+    authService.recordLogin(user);
+    setAuthenticatedUser(user);
+    showBanner(`Account created! Welcome to KishanSetu, ${user.name}!`);
+    if (onLoginSuccess) {
+      onLoginSuccess(user);
+    }
+    if (onNavigateDashboard) {
+      onNavigateDashboard(user.role);
+    } else {
+      setView('dashboard');
+    }
   };
 
   // Password reset finished
