@@ -290,7 +290,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: AdminApp
   };
 
   return (
-    <div className="min-h-screen admin-dashboard-root bg-slate-950 text-slate-100 flex flex-col font-sans transition-colors duration-200">
+    <div className="min-h-screen admin-dashboard-root text-slate-100 flex flex-col font-sans transition-colors duration-200">
       {/* Top Header & Running Metric Summary Strip */}
       <HeaderStrip
         metrics={metrics}
@@ -311,8 +311,42 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: AdminApp
 
       {/* Main Operations Canvas */}
       <main className="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        {/* Scenic Platform Administration Banner */}
+        <div className="relative rounded-2xl overflow-hidden shadow-md border border-purple-500/20 mb-6 bg-gradient-to-r from-purple-950/90 via-slate-900/80 to-slate-950/90 p-5 sm:p-6 text-white">
+          <div 
+            className="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-overlay pointer-events-none"
+            style={{ backgroundImage: `url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&auto=format&fit=crop&q=80')` }}
+          />
+          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-400/30">
+                  🛡️ National Agricultural Governance Council
+                </span>
+                <span className="text-xs text-slate-300">• Root Clearance</span>
+              </div>
+              <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-white">
+                Platform Operations & Super Admin Control Center
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
+                Supervise multi-role participants, review legal credentials, enforce SLA standards, and manage national agrarian telemetry.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-md rounded-xl p-3 border border-white/15 text-center min-w-[100px]">
+                <p className="text-[10px] text-purple-300 uppercase font-semibold">Total Users</p>
+                <p className="text-xl font-extrabold text-white">{metrics.totalUsers}</p>
+              </div>
+              <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-md rounded-xl p-3 border border-white/15 text-center min-w-[100px]">
+                <p className="text-[10px] text-amber-300 uppercase font-semibold">KYC Pending</p>
+                <p className="text-xl font-extrabold text-white">{metrics.pendingVerifications}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Descriptive Section Heading & Mode Switcher */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-900 pb-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
           <div>
             <h1 className="text-xl sm:text-2xl font-black text-slate-100 tracking-tight flex items-center gap-2.5">
               <span>Platform Operations & Super Admin Control Center</span>

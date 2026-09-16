@@ -202,9 +202,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: BulkBuye
     );
   };
 
-  return (
-
-    <div className="min-h-screen bulk-buyer-dashboard-root bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-emerald-200 selection:text-emerald-900 pb-16 lg:pb-8 transition-colors duration-200">
+  return (    <div className="min-h-screen bulk-buyer-dashboard-root text-slate-900 dark:text-slate-100 flex flex-col font-sans selection:bg-emerald-200 selection:text-emerald-900 pb-16 lg:pb-8 transition-colors duration-200">
       {/* Toast Alert */}
       {toast && (
         <div 
@@ -243,9 +241,41 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: BulkBuye
         onSelectTab={setFocusedTab}
       />
 
-
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 py-4 sm:py-6" id="dashboard-main">
+        {/* Scenic B2B Agricultural Procurement Banner */}
+        <div className="relative rounded-2xl overflow-hidden shadow-md border border-amber-500/20 mb-6 bg-gradient-to-r from-amber-950/90 via-slate-900/80 to-slate-950/90 p-5 sm:p-6 text-white">
+          <div 
+            className="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-overlay pointer-events-none"
+            style={{ backgroundImage: `url('https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=1200&auto=format&fit=crop&q=80')` }}
+          />
+          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-400/30">
+                  🏢 Tier-1 Institutional Mandi Highway
+                </span>
+                <span className="text-xs text-slate-300">• Direct Silo Procurement</span>
+              </div>
+              <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-white">
+                B2B Bulk Buyer Procurement Portal
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
+                Execute large-scale multi-tonnage agricultural contracts, tiered volume discounts, and verified weighbridge manifests with escrow security.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-md rounded-xl p-3 border border-white/15 text-center min-w-[100px]">
+                <p className="text-[10px] text-amber-300 uppercase font-semibold">Volume Tiers</p>
+                <p className="text-xl font-extrabold text-white">Up to 11.5%</p>
+              </div>
+              <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-md rounded-xl p-3 border border-white/15 text-center min-w-[100px]">
+                <p className="text-[10px] text-emerald-300 uppercase font-semibold">Assaying QC</p>
+                <p className="text-xl font-extrabold text-white">e-NAM Standard</p>
+              </div>
+            </div>
+          </div>
+        </div>
         {/* Desktop View Switcher Strip */}
         <div className="hidden lg:flex items-center justify-between mb-4 pb-2 border-b border-slate-200/80 dark:border-slate-800 text-xs">
           <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">

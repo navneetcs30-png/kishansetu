@@ -338,7 +338,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f8f9fa] dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-200">
+    <div className="min-h-screen flex flex-col text-slate-800 dark:text-slate-100 transition-colors duration-200">
       {/* Accessibility Skip Link */}
       <a
         href="#main-dashboard-panels"
@@ -379,6 +379,40 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
             id="main-dashboard-panels"
             className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-24 md:pb-12"
           >
+            {/* Scenic Agricultural Hero Banner */}
+            <div className="relative rounded-2xl overflow-hidden shadow-md border border-emerald-500/20 mb-6 bg-gradient-to-r from-emerald-900/90 via-slate-900/80 to-emerald-950/90 p-5 sm:p-6 text-white">
+              <div 
+                className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay pointer-events-none"
+                style={{ backgroundImage: `url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1200&auto=format&fit=crop&q=80')` }}
+              />
+              <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                      🌾 National Mandi Feeds Active
+                    </span>
+                    <span className="text-xs text-slate-300">• MSP Guaranteed</span>
+                  </div>
+                  <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-white">
+                    Farmer Mandi Hub & Production Desk
+                  </h1>
+                  <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
+                    Live government MSP rates, verified vegetable benchmarks across mandis, and direct market orders with zero middleman commission.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-md rounded-xl p-3 border border-white/15 text-center min-w-[100px]">
+                    <p className="text-[10px] text-emerald-300 uppercase font-semibold">MSP Crops</p>
+                    <p className="text-xl font-extrabold text-white">6 Grains</p>
+                  </div>
+                  <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-md rounded-xl p-3 border border-white/15 text-center min-w-[100px]">
+                    <p className="text-[10px] text-amber-300 uppercase font-semibold">Mandi Feeds</p>
+                    <p className="text-xl font-extrabold text-white">Live Daily</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Farmer Verification Status Banner */}
             <VerificationStatusBanner
               submission={currentFarmerSubmission}

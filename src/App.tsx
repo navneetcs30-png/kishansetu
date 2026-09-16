@@ -179,48 +179,40 @@ function PlatformShell() {
         canDismiss={true}
       />
 
-      <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+      {/* Fixed Fullscreen Agricultural Imagery Backdrop */}
+      <div className="agri-bg-overlay" aria-hidden="true" />
+
+      <div className="relative z-10 min-h-screen flex flex-col text-slate-900 dark:text-slate-100">
         {/* Top Persistent KishanSetu Platform Navigation Header */}
-        <header className="sticky top-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white shadow-sm transition-colors duration-200">
+        <header className="sticky top-0 z-50 agri-header-glass text-slate-900 dark:text-white shadow-xs transition-colors duration-200">
           
           {/* Top Ecosystem Status Banner */}
-          <div className="bg-slate-100/90 dark:bg-slate-950/80 px-4 py-1.5 border-b border-slate-200 dark:border-slate-800/80 text-[11px] text-slate-600 dark:text-slate-400 flex flex-wrap items-center justify-between gap-2 transition-colors duration-200">
+          <div className="bg-slate-100/80 dark:bg-slate-950/70 backdrop-blur-md px-4 py-1.5 border-b border-slate-200/80 dark:border-slate-800/60 text-[11px] text-slate-600 dark:text-slate-400 flex flex-wrap items-center justify-between gap-2 transition-colors duration-200">
             <div className="flex items-center gap-2">
               <span className="flex h-2 w-2 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                {t('app.ecosystemLive', 'KishanSetu Ecosystem Live')}:
+              <span className="font-bold text-emerald-700 dark:text-emerald-400">
+                {t('app.title', 'KishanSetu')} • {t('app.ecosystemLive', 'Highway Live')}
               </span>
-              <span className="text-slate-600 dark:text-slate-300 hidden sm:inline">
-                {t('app.modulesBadge', '5 Integrated Modules • Single Sign-On • Real-Time Mandi Feeds')}
+              <span className="text-slate-500 dark:text-slate-400 hidden sm:inline">
+                • {t('app.modulesBadge', 'APMC Mandi Benchmarks & Direct Farmer Marketplace')}
               </span>
               <button
                 type="button"
                 onClick={() => setIsSupabaseModalOpen(true)}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 transition-all cursor-pointer shadow-xs ml-1"
-                title="Inspect Supabase Cloud Database & Connection Status"
+                className="hidden lg:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 transition-all cursor-pointer shadow-xs ml-1"
+                title="Inspect Supabase Cloud Database Status"
               >
                 <Database className="w-2.5 h-2.5" />
                 <span>{t('app.supabaseCloud', 'Supabase Cloud')}</span>
               </button>
-              <button
-                type="button"
-                onClick={() => setShowSplash(true)}
-                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 transition-all cursor-pointer shadow-xs ml-0.5"
-                title="Play KishanSetu Logo Intro Animation"
-              >
-                <Sparkles className="w-2.5 h-2.5 text-amber-500" />
-                <span className="hidden xs:inline">{t('app.replayLogo', 'Replay Logo')}</span>
-              </button>
             </div>
 
-            <div className="flex items-center gap-2.5 sm:gap-3">
-              <span className="text-slate-500 dark:text-slate-400 hidden md:inline">
-                {t('app.quickPersona', 'Quick Persona Switcher')}:
-              </span>
-              <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2 sm:gap-2.5">
+              {/* Quick Persona Switcher with Avatar Pills */}
+              <div className="flex items-center gap-1 bg-white/70 dark:bg-slate-900/70 p-0.5 rounded-lg border border-slate-200/80 dark:border-slate-800/80">
                 {demoPersonas.map((persona) => {
                   const isSelected = currentUser?.role === persona.role;
                   const IconComponent = persona.icon;
@@ -238,10 +230,10 @@ function PlatformShell() {
                           if (matched) handleSelectUser(matched);
                         }
                       }}
-                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium transition-all cursor-pointer ${
+                      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium transition-all cursor-pointer ${
                         isSelected
-                          ? 'bg-emerald-600 text-white shadow-sm'
-                          : 'bg-slate-200/80 hover:bg-slate-300/80 text-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 dark:hover:text-white'
+                          ? 'bg-emerald-600 text-white shadow-xs font-semibold'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800'
                       }`}
                       title={
                         persona.role === 'admin' && currentUser?.role !== 'admin'
@@ -261,7 +253,6 @@ function PlatformShell() {
               </div>
 
               {/* Language Selector Pill in Top Bar */}
-              <div className="h-3.5 w-px bg-slate-300 dark:bg-slate-700/80 mx-0.5 hidden sm:block"></div>
               <button
                 type="button"
                 onClick={() => setIsLanguageModalOpen(true)}
@@ -270,26 +261,25 @@ function PlatformShell() {
               >
                 <Languages className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                 <span>{currentLanguageInfo.nativeName}</span>
-                <span className="text-[9px] opacity-70 hidden xs:inline">({currentLanguageInfo.code.toUpperCase()})</span>
               </button>
 
-              {/* Unified Single Global Theme Mode Toggle in Top Status Strip */}
+              {/* Single Global Theme Mode Toggle */}
               <button
                 type="button"
                 onClick={toggleTheme}
-                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-200 hover:bg-slate-300 text-slate-800 border border-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-700/80 transition-all cursor-pointer shadow-xs"
+                className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-200/80 hover:bg-slate-300 text-slate-800 border border-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-200 dark:border-slate-700/80 transition-all cursor-pointer shadow-xs"
                 title={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
                 aria-label={`Switch to ${theme === 'dark' ? 'Light' : 'Dark'} Mode`}
               >
                 {theme === 'dark' ? (
                   <>
                     <Sun className="w-3 h-3 text-amber-400" />
-                    <span className="hidden sm:inline">{t('app.lightMode', 'Light Mode')}</span>
+                    <span className="hidden sm:inline">{t('app.lightMode', 'Light')}</span>
                   </>
                 ) : (
                   <>
                     <Moon className="w-3 h-3 text-indigo-500" />
-                    <span className="hidden sm:inline">{t('app.darkMode', 'Dark Mode')}</span>
+                    <span className="hidden sm:inline">{t('app.darkMode', 'Dark')}</span>
                   </>
                 )}
               </button>

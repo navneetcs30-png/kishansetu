@@ -169,7 +169,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: Consumer
   const activeOrdersCount = orders.filter((o) => ['Placed', 'Confirmed', 'Dispatched'].includes(o.status)).length;
 
   return (
-    <div className="min-h-screen consumer-dashboard-root bg-stone-100/70 dark:bg-slate-950 text-stone-900 dark:text-slate-100 flex flex-col font-sans antialiased selection:bg-emerald-100 selection:text-emerald-900 pb-20 md:pb-10 transition-colors duration-200">
+    <div className="min-h-screen consumer-dashboard-root text-stone-900 dark:text-slate-100 flex flex-col font-sans antialiased selection:bg-emerald-100 selection:text-emerald-900 pb-20 md:pb-10 transition-colors duration-200">
       {/* Sticky Header with Live Cart Total */}
       <Header
         totalCartAmount={finalCartAmount}
@@ -212,22 +212,37 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: Consumer
 
       {/* Main Dashboard Layout */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
-        {/* Buyer Welcome & Layout Context */}
-        <div className="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-stone-900 dark:text-white">
-              Customer Produce & Procurement Hub
-            </h2>
-            <p className="text-xs sm:text-sm text-stone-500 dark:text-slate-400 mt-0.5">
-              Transparent direct buying, live dispatch tracking, shelf-life guides & consumer welfare schemes.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 self-start sm:self-auto">
-            <span className="text-[11px] font-medium text-stone-500 dark:text-slate-300 bg-white dark:bg-slate-900 px-3 py-1.5 rounded-xl border border-stone-200 dark:border-slate-800 shadow-xs flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              Verified Direct Mandi Feed
-            </span>
+        {/* Scenic Farm-to-Table Banner */}
+        <div className="relative rounded-2xl overflow-hidden shadow-md border border-blue-500/20 mb-6 bg-gradient-to-r from-blue-950/90 via-slate-900/80 to-emerald-950/90 p-5 sm:p-6 text-white">
+          <div 
+            className="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-overlay pointer-events-none"
+            style={{ backgroundImage: `url('https://images.unsplash.com/photo-1592982537447-7440770cbfc9?w=1200&auto=format&fit=crop&q=80')` }}
+          />
+          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                  🌿 100% Certified Direct Producer Store
+                </span>
+                <span className="text-xs text-slate-300">• Farm-to-Doorstep</span>
+              </div>
+              <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-white">
+                AgriDirect Consumer Marketplace
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
+                Fresh harvest delivered straight from Indian farms with verified origin tracing, zero pesticide certifications, and fair pricing.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-md rounded-xl p-3 border border-white/15 text-center min-w-[100px]">
+                <p className="text-[10px] text-blue-300 uppercase font-semibold">Tier Discount</p>
+                <p className="text-xl font-extrabold text-white">Up to 15%</p>
+              </div>
+              <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-md rounded-xl p-3 border border-white/15 text-center min-w-[100px]">
+                <p className="text-[10px] text-emerald-300 uppercase font-semibold">Quality Assured</p>
+                <p className="text-xl font-extrabold text-white">Grade A</p>
+              </div>
+            </div>
           </div>
         </div>
 
