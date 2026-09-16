@@ -114,6 +114,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: AdminApp
     const bulkBuyers = users.filter((u) => u.role === 'Bulk Buyer' && u.accountStatus === 'Active').length + 384;
     const consumers = users.filter((u) => u.role === 'Consumer' && u.accountStatus === 'Active').length + 8936;
     const totalPlatform = farmers + bulkBuyers + consumers + users.length;
+    const slaBreachesCount = verifications.filter((v) => v.status === 'Pending' && v.waitingHours > 24).length;
 
     return {
       totalUsers: totalPlatform,
@@ -123,6 +124,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: AdminApp
       activeFarmers: farmers,
       activeBulkBuyers: bulkBuyers,
       activeConsumers: consumers,
+      slaBreaches: slaBreachesCount,
     };
   }, [users, verifications]);
 
@@ -346,28 +348,32 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: AdminApp
         </div>
 
         {/* Descriptive Section Heading & Mode Switcher */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
-          <div>
-            <h1 className="text-xl sm:text-2xl font-black text-slate-100 tracking-tight flex items-center gap-2.5">
-              <span>Platform Operations & Super Admin Control Center</span>
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1">
-              Supervise multi-role participants, review legal credentials, enforce SLA standards, and manage system access privileges.
-            </p>
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800/80 pb-4">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-purple-500 animate-pulse" />
+            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+              Operations Canvas • {
+                adminSection === 'control-tower' ? 'Super Admin Parameters' :
+                adminSection === 'users' ? `User Directory (${users.length})` :
+                adminSection === 'verifications' ? `Verification Queue (${metrics.pendingVerifications})` :
+                adminSection === 'roles' ? 'RBAC Permissions' :
+                adminSection === 'guidance' ? 'Operational SOPs' : '2×2 Overview Grid'
+              }
+            </h2>
           </div>
 
           {/* Admin Mode Switcher Tabs */}
-          <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-slate-900 border border-slate-800 text-xs font-semibold">
+          <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-slate-100/90 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-semibold">
             <button
               type="button"
               onClick={() => setAdminSection('control-tower')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 adminSection === 'control-tower'
-                  ? 'bg-purple-600 text-white shadow-sm font-bold'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                  ? 'bg-purple-600 text-white shadow-xs font-bold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800'
               }`}
             >
-              <Zap className="w-3.5 h-3.5 text-purple-300" />
+              <Zap className="w-3.5 h-3.5 text-purple-400" />
               <span>⚡ Super Admin Control Tower</span>
             </button>
 
@@ -376,11 +382,11 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: AdminApp
               onClick={() => setAdminSection('users')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 adminSection === 'users'
-                  ? 'bg-blue-600 text-white shadow-sm font-bold'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                  ? 'bg-blue-600 text-white shadow-xs font-bold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800'
               }`}
             >
-              <Users className="w-3.5 h-3.5 text-blue-300" />
+              <Users className="w-3.5 h-3.5 text-blue-400" />
               <span>👥 Users ({users.length})</span>
             </button>
 
@@ -389,11 +395,11 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: AdminApp
               onClick={() => setAdminSection('verifications')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 adminSection === 'verifications'
-                  ? 'bg-emerald-600 text-white shadow-sm font-bold'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                  ? 'bg-emerald-600 text-white shadow-xs font-bold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800'
               }`}
             >
-              <FileCheck className="w-3.5 h-3.5 text-emerald-300" />
+              <FileCheck className="w-3.5 h-3.5 text-emerald-400" />
               <span>📋 Verification Queue ({metrics.pendingVerifications})</span>
             </button>
 
@@ -402,11 +408,11 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: AdminApp
               onClick={() => setAdminSection('roles')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 adminSection === 'roles'
-                  ? 'bg-indigo-600 text-white shadow-sm font-bold'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                  ? 'bg-indigo-600 text-white shadow-xs font-bold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800'
               }`}
             >
-              <ShieldAlert className="w-3.5 h-3.5 text-indigo-300" />
+              <ShieldAlert className="w-3.5 h-3.5 text-indigo-400" />
               <span>🛡️ RBAC Permissions</span>
             </button>
 
@@ -415,11 +421,11 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: AdminApp
               onClick={() => setAdminSection('guidance')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 adminSection === 'guidance'
-                  ? 'bg-teal-600 text-white shadow-sm font-bold'
-                  : 'text-slate-300 hover:text-white hover:bg-slate-800'
+                  ? 'bg-teal-600 text-white shadow-xs font-bold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800'
               }`}
             >
-              <BookOpen className="w-3.5 h-3.5 text-teal-300" />
+              <BookOpen className="w-3.5 h-3.5 text-teal-400" />
               <span>📖 SOPs</span>
             </button>
 
@@ -428,13 +434,12 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: AdminApp
               onClick={() => setAdminSection('grid')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                 adminSection === 'grid'
-                  ? 'bg-slate-800 text-white shadow-sm font-bold'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-slate-700 text-white shadow-xs font-bold'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/80 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800'
               }`}
-              title="2x2 Multi-Panel Grid View"
             >
-              <Grid2X2 className="w-3.5 h-3.5" />
-              <span>2×2 Grid</span>
+              <Grid2X2 className="w-3.5 h-3.5 text-slate-400" />
+              <span>🎛️ 2×2 Grid</span>
             </button>
           </div>
         </div>

@@ -97,4 +97,5 @@ export interface DashboardMetrics {
   activeFarmers: number;
   activeBulkBuyers: number;
   activeConsumers: number;
+  slaBreaches?: number;
 }

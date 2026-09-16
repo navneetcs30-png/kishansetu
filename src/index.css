@@ -59,52 +59,202 @@ html:not(.dark) .admin-dashboard-root {
   color: #0f172a !important;
 }
 
-html:not(.dark) .admin-dashboard-root .bg-slate-950 {
-  background-color: transparent !important;
-  color: #0f172a !important;
-}
-
-html:not(.dark) .admin-dashboard-root .bg-slate-900,
+/* Base Panel & Card Containers in Light Mode */
+html:not(.dark) .admin-dashboard-root section[id^="panel-"],
+html:not(.dark) .admin-dashboard-root .bg-slate-900:not([class*="from-"]):not([class*="bg-gradient-"]),
 html:not(.dark) .admin-dashboard-root .bg-slate-900\/60,
 html:not(.dark) .admin-dashboard-root .bg-slate-900\/80,
 html:not(.dark) .admin-dashboard-root .bg-slate-900\/90 {
-  background-color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.94) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Panel Header Sub-strips & Search Containers */
+html:not(.dark) .admin-dashboard-root .bg-slate-950\/50,
+html:not(.dark) .admin-dashboard-root .bg-slate-950\/60,
+html:not(.dark) .admin-dashboard-root .bg-slate-950\/70,
+html:not(.dark) .admin-dashboard-root .bg-slate-950\/80,
+html:not(.dark) .admin-dashboard-root .bg-slate-950\/90 {
+  background-color: rgba(248, 250, 252, 0.90) !important;
   border-color: #e2e8f0 !important;
   color: #0f172a !important;
 }
 
-html:not(.dark) .admin-dashboard-root .bg-slate-950\/60,
-html:not(.dark) .admin-dashboard-root .bg-slate-950\/70,
-html:not(.dark) .admin-dashboard-root .bg-slate-950\/80 {
-  background-color: #f1f5f9 !important;
-  border-color: #e2e8f0 !important;
-}
-
+/* Border overrides */
 html:not(.dark) .admin-dashboard-root .border-slate-800,
 html:not(.dark) .admin-dashboard-root .border-slate-800\/80,
+html:not(.dark) .admin-dashboard-root .border-slate-800\/90,
 html:not(.dark) .admin-dashboard-root .border-slate-700,
+html:not(.dark) .admin-dashboard-root .border-slate-700\/80,
 html:not(.dark) .admin-dashboard-root .border-purple-900\/40,
 html:not(.dark) .admin-dashboard-root .border-purple-900\/30 {
   border-color: #e2e8f0 !important;
 }
 
-html:not(.dark) .admin-dashboard-root .text-slate-100,
-html:not(.dark) .admin-dashboard-root .text-slate-200,
-html:not(.dark) .admin-dashboard-root .text-white {
-  color: #0f172a !important;
-}
-
-html:not(.dark) .admin-dashboard-root .text-slate-400,
-html:not(.dark) .admin-dashboard-root .text-slate-300 {
-  color: #475569 !important;
-}
-
+/* Form Inputs, Selects, and Textareas */
 html:not(.dark) .admin-dashboard-root input,
 html:not(.dark) .admin-dashboard-root select,
 html:not(.dark) .admin-dashboard-root textarea {
   background-color: #ffffff !important;
   border-color: #cbd5e1 !important;
   color: #0f172a !important;
+}
+
+html:not(.dark) .admin-dashboard-root input::placeholder,
+html:not(.dark) .admin-dashboard-root textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Standard Text Contrast (without breaking white text in dark buttons/banners) */
+html:not(.dark) .admin-dashboard-root h1:not([class*="from-"]):not([class*="bg-gradient-"]),
+html:not(.dark) .admin-dashboard-root h2:not([class*="from-"]):not([class*="bg-gradient-"]),
+html:not(.dark) .admin-dashboard-root h3:not([class*="from-"]):not([class*="bg-gradient-"]),
+html:not(.dark) .admin-dashboard-root h4:not([class*="from-"]):not([class*="bg-gradient-"]) {
+  color: #0f172a;
+}
+
+/* Light Mode Badge Colors */
+html:not(.dark) .admin-dashboard-root .bg-emerald-950\/80 {
+  background-color: #ecfdf5 !important;
+  border-color: #a7f3d0 !important;
+  color: #065f46 !important;
+}
+
+html:not(.dark) .admin-dashboard-root .bg-blue-950\/80 {
+  background-color: #eff6ff !important;
+  border-color: #bfdbfe !important;
+  color: #1e40af !important;
+}
+
+html:not(.dark) .admin-dashboard-root .bg-amber-950\/80 {
+  background-color: #fffbeb !important;
+  border-color: #fde68a !important;
+  color: #92400e !important;
+}
+
+html:not(.dark) .admin-dashboard-root .bg-purple-950\/80 {
+  background-color: #faf5ff !important;
+  border-color: #e9d5ff !important;
+  color: #6b21a8 !important;
+}
+
+html:not(.dark) .admin-dashboard-root .bg-rose-950\/80 {
+  background-color: #fff1f2 !important;
+  border-color: #fecdd3 !important;
+  color: #9f1239 !important;
+}
+
+html:not(.dark) .admin-dashboard-root .bg-slate-800:not(button):not([class*="bg-purple"]):not([class*="bg-emerald"]):not([class*="bg-blue"]) {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+/* Tables in Light Mode */
+html:not(.dark) .admin-dashboard-root table th {
+  background-color: #f8fafc !important;
+  color: #475569 !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+html:not(.dark) .admin-dashboard-root table td {
+  border-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+html:not(.dark) .admin-dashboard-root table tr:hover td {
+  background-color: #f8fafc !important;
+}
+
+/* Protect White Text in Colored Buttons and Dark Scenic Banners */
+html:not(.dark) .admin-dashboard-root [class*="from-purple-950"] h1,
+html:not(.dark) .admin-dashboard-root [class*="from-purple-950"] h2,
+html:not(.dark) .admin-dashboard-root [class*="from-purple-950"] p,
+html:not(.dark) .admin-dashboard-root [class*="from-purple-950"] span:not([class*="text-purple-"]):not([class*="text-amber-"]):not([class*="text-emerald-"]),
+html:not(.dark) .admin-dashboard-root [class*="from-indigo-950"] h2,
+html:not(.dark) .admin-dashboard-root [class*="from-indigo-950"] p,
+html:not(.dark) .admin-dashboard-root button.bg-purple-600,
+html:not(.dark) .admin-dashboard-root button.bg-emerald-600,
+html:not(.dark) .admin-dashboard-root button.bg-blue-600,
+html:not(.dark) .admin-dashboard-root button.bg-amber-600,
+html:not(.dark) .admin-dashboard-root button.bg-indigo-600,
+html:not(.dark) .admin-dashboard-root button.bg-teal-600,
+html:not(.dark) .admin-dashboard-root button[class*="from-emerald-600"] {
+  color: #ffffff !important;
+}
+
+/* High-contrast text for table rows and user directory in light mode */
+html:not(.dark) .admin-dashboard-root td .text-slate-200,
+html:not(.dark) .admin-dashboard-root td .text-slate-100 {
+  color: #0f172a !important;
+}
+
+html:not(.dark) .admin-dashboard-root td .text-slate-400 {
+  color: #475569 !important;
+}
+
+html:not(.dark) .admin-dashboard-root td .text-slate-500 {
+  color: #64748b !important;
+}
+
+/* User directory avatar chip in light mode */
+html:not(.dark) .admin-dashboard-root .w-7.h-7.rounded-lg.bg-slate-800 {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
+}
+
+/* Super Admin Banner Metric Cards (keep dark with vibrant text inside banner) */
+html:not(.dark) .admin-dashboard-root [class*="from-purple-950"] .bg-slate-950\/60,
+html:not(.dark) .admin-dashboard-root [class*="from-indigo-950"] .bg-slate-950\/60 {
+  background-color: rgba(15, 23, 42, 0.75) !important;
+  border-color: rgba(168, 85, 247, 0.35) !important;
+  color: #ffffff !important;
+}
+
+html:not(.dark) .admin-dashboard-root [class*="from-purple-950"] .bg-slate-950\/60 p.text-slate-400,
+html:not(.dark) .admin-dashboard-root [class*="from-indigo-950"] .bg-slate-950\/60 p.text-slate-400 {
+  color: #cbd5e1 !important;
+}
+
+/* Reset Defaults button in banner */
+html:not(.dark) .admin-dashboard-root [class*="from-purple-950"] button.bg-slate-900 {
+  background-color: rgba(15, 23, 42, 0.85) !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+
+html:not(.dark) .admin-dashboard-root [class*="from-purple-950"] button.bg-slate-900:hover {
+  background-color: rgba(30, 41, 59, 0.95) !important;
+  color: #ffffff !important;
+}
+
+/* Super Admin Quick Increments (+₹50, +₹100) & Parameter Card Inputs */
+html:not(.dark) .admin-dashboard-root button.bg-slate-800,
+html:not(.dark) .admin-dashboard-root button.bg-slate-900:not([class*="text-white"]):not([class*="bg-purple"]):not([class*="bg-emerald"]) {
+  background-color: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+  color: #1e293b !important;
+}
+
+html:not(.dark) .admin-dashboard-root button.bg-slate-800:hover,
+html:not(.dark) .admin-dashboard-root button.bg-slate-900:hover {
+  background-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* Parameter Category Navigation Bar in Light Mode */
+html:not(.dark) .admin-dashboard-root .rounded-2xl.bg-slate-900 {
+  background-color: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+}
+
+html:not(.dark) .admin-dashboard-root .rounded-2xl.bg-slate-900 button:not([class*="bg-emerald-600"]):not([class*="bg-blue-600"]):not([class*="bg-amber-600"]):not([class*="bg-purple-600"]):not([class*="bg-indigo-600"]) {
+  color: #475569 !important;
 }
 
 /* --- 2. DARK MODE RULES FOR BULK BUYER DASHBOARD --- */
