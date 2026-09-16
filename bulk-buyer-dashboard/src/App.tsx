@@ -85,8 +85,8 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: BulkBuye
   const [inspectedScheme, setInspectedScheme] = useState<TradeScheme | null>(null);
 
 
-  // Desktop view mode toggle (2x2 Grid vs Focused Tab view)
-  const [desktopLayout, setDesktopLayout] = useState<'grid' | 'tabs'>('grid');
+  // Desktop view mode toggle (Focused Tab view vs 2x2 Grid view)
+  const [desktopLayout, setDesktopLayout] = useState<'grid' | 'tabs'>('tabs');
   const [focusedTab, setFocusedTab] = useState<'procurement' | 'contracts' | 'guidance' | 'compliance'>('procurement');
 
   // Toast feedback
@@ -225,7 +225,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: BulkBuye
         </div>
       )}
 
-      {/* Prominent Header with Live Running Total */}
+      {/* Prominent Header with Live Running Total & Panel Switcher */}
       <HeaderStats
         totalProcurementValue={totalProcurementValue}
         totalQuintals={totalQuintals}
@@ -237,6 +237,10 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: BulkBuye
         onResetQuantities={handleResetQuantities}
         onOpenOrderModal={() => setOrderModal({ isOpen: true, mode: 'order' })}
         onOpenVerificationModal={() => setIsVerificationModalOpen(true)}
+        desktopLayout={desktopLayout}
+        onSelectLayout={setDesktopLayout}
+        focusedTab={focusedTab}
+        onSelectTab={setFocusedTab}
       />
 
 

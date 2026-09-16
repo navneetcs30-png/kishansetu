@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingCart, ArrowRight } from 'lucide-react';
+import { ShoppingCart, ArrowRight, LayoutGrid } from 'lucide-react';
 import { useLanguage } from '../../../src/i18n/LanguageContext';
 
 interface HeaderProps {
@@ -78,6 +78,20 @@ export const Header: React.FC<HeaderProps> = ({
               }`}
             >
               {t('consumer.schemes', 'Offers & Schemes')}
+            </button>
+            <div className="h-3.5 w-px bg-stone-300 dark:bg-slate-700 mx-0.5" />
+            <button
+              type="button"
+              onClick={() => onNavigate('all')}
+              className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer flex items-center gap-1 ${
+                activeSection === 'all'
+                  ? 'bg-stone-900 dark:bg-white text-white dark:text-slate-900 shadow-xs font-semibold'
+                  : 'hover:text-stone-900 dark:hover:text-white hover:bg-stone-200/50 dark:hover:bg-slate-800/60 text-stone-500 dark:text-slate-400'
+              }`}
+              title="Show all 4 panels simultaneously in 2x2 grid"
+            >
+              <LayoutGrid className="w-3 h-3" />
+              <span>All Panels (Grid)</span>
             </button>
           </nav>
         </div>

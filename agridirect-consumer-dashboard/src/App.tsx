@@ -128,10 +128,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: Consumer
   // Navigation handler
   const handleNavigate = (sectionId: string) => {
     setActiveSection(sectionId);
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    window.scrollTo({ top: 120, behavior: 'smooth' });
   };
 
   // Confirm order from checkout
@@ -234,45 +231,82 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: Consumer
           </div>
         </div>
 
-        {/* 2x2 Clean Responsive Grid on Desktop, stacking to 1 column on Mobile */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
-          {/* Panel 1: Browse & Buy Produce */}
-          <div className="h-full min-h-[560px]">
-            <BrowseProducePanel
-              produceList={activeProduceList}
-              cartQuantities={cartQuantities}
-              onUpdateQuantity={handleUpdateQuantity}
-              onClearCart={handleClearCart}
-              onProceedToOrder={() => setIsCheckoutOpen(true)}
-              subtotal={subtotal}
-              totalWeightKg={totalWeightKg}
-              bulkDiscountAmount={bulkDiscountAmount}
-              finalCartAmount={finalCartAmount}
-            />
-          </div>
+        {/* Focused Panel Mode or 2x2 Clean Responsive Grid */}
+        {activeSection === 'all' ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch animate-in fade-in duration-200">
+            {/* Panel 1: Browse & Buy Produce */}
+            <div className="h-full min-h-[560px]">
+              <BrowseProducePanel
+                produceList={activeProduceList}
+                cartQuantities={cartQuantities}
+                onUpdateQuantity={handleUpdateQuantity}
+                onClearCart={handleClearCart}
+                onProceedToOrder={() => setIsCheckoutOpen(true)}
+                subtotal={subtotal}
+                totalWeightKg={totalWeightKg}
+                bulkDiscountAmount={bulkDiscountAmount}
+                finalCartAmount={finalCartAmount}
+              />
+            </div>
 
-          {/* Panel 2: My Orders */}
-          <div className="h-full min-h-[560px]">
-            <MyOrdersPanel
-              orders={orders}
-              onReorder={handleReorder}
-              onViewReceipt={(order) => setViewingReceiptOrder(order)}
-            />
-          </div>
+            {/* Panel 2: My Orders */}
+            <div className="h-full min-h-[560px]">
+              <MyOrdersPanel
+                orders={orders}
+                onReorder={handleReorder}
+                onViewReceipt={(order) => setViewingReceiptOrder(order)}
+              />
+            </div>
 
-          {/* Panel 3: Buying & Storage Guidance */}
-          <div className="h-full min-h-[560px]">
-            <GuidancePanel topics={GUIDANCE_TOPICS} />
-          </div>
+            {/* Panel 3: Buying & Storage Guidance */}
+            <div className="h-full min-h-[560px]">
+              <GuidancePanel topics={GUIDANCE_TOPICS} />
+            </div>
 
-          {/* Panel 4: Offers & Consumer Schemes */}
-          <div className="h-full min-h-[560px]">
-            <OffersSchemesPanel
-              schemes={CONSUMER_SCHEMES}
-              onSelectScheme={(scheme) => setSelectedScheme(scheme)}
-            />
+            {/* Panel 4: Offers & Consumer Schemes */}
+            <div className="h-full min-h-[560px]">
+              <OffersSchemesPanel
+                schemes={CONSUMER_SCHEMES}
+                onSelectScheme={(scheme) => setSelectedScheme(scheme)}
+              />
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="w-full max-w-5xl mx-auto animate-in fade-in duration-200 space-y-6">
+            {activeSection === 'panel-produce' && (
+              <BrowseProducePanel
+                produceList={activeProduceList}
+                cartQuantities={cartQuantities}
+                onUpdateQuantity={handleUpdateQuantity}
+                onClearCart={handleClearCart}
+                onProceedToOrder={() => setIsCheckoutOpen(true)}
+                subtotal={subtotal}
+                totalWeightKg={totalWeightKg}
+                bulkDiscountAmount={bulkDiscountAmount}
+                finalCartAmount={finalCartAmount}
+              />
+            )}
+
+            {activeSection === 'panel-orders' && (
+              <MyOrdersPanel
+                orders={orders}
+                onReorder={handleReorder}
+                onViewReceipt={(order) => setViewingReceiptOrder(order)}
+              />
+            )}
+
+            {activeSection === 'panel-guidance' && (
+              <GuidancePanel topics={GUIDANCE_TOPICS} />
+            )}
+
+            {activeSection === 'panel-offers' && (
+              <OffersSchemesPanel
+                schemes={CONSUMER_SCHEMES}
+                onSelectScheme={(scheme) => setSelectedScheme(scheme)}
+              />
+            )}
+          </div>
+        )}
       </main>
 
       {/* Sticky Quick-Navigation Bar for Mobile */}

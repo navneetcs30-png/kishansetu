@@ -1,20 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import { Wheat, Carrot, BookOpen, Landmark, Sparkles, Bot } from 'lucide-react';
+import React from 'react';
+import { Wheat, Carrot, BookOpen, Landmark, Sparkles, Bot, LayoutGrid } from 'lucide-react';
 import { formatINR } from '../utils/formatters';
 
 interface NavigationJumpBarProps {
   totalGrainValue: number;
   totalVegetableValue: number;
   onOpenAI?: () => void;
+  activePanel: string;
+  onSelectPanel: (panelId: string) => void;
 }
 
 export const NavigationJumpBar: React.FC<NavigationJumpBarProps> = ({
   totalGrainValue,
   totalVegetableValue,
   onOpenAI,
+  activePanel,
+  onSelectPanel,
 }) => {
-  const [activePanel, setActivePanel] = useState<string>('panel-grains');
-
   const navItems = [
     {
       id: 'panel-grains',
@@ -50,36 +52,13 @@ export const NavigationJumpBar: React.FC<NavigationJumpBarProps> = ({
     },
   ];
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollPosition = window.scrollY + 140;
-      for (let i = navItems.length - 1; i >= 0; i--) {
-        const el = document.getElementById(navItems[i].id);
-        if (el && el.offsetTop <= scrollPosition) {
-          setActivePanel(navItems[i].id);
-          break;
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const handleJump = (id: string, e: React.MouseEvent) => {
+  const handleItemClick = (id: string, e: React.MouseEvent) => {
     e.preventDefault();
-    setActivePanel(id);
-    const target = document.getElementById(id);
-    if (target) {
-      const headerOffset = 72; // sticky header + jump bar height offset
-      const elementPosition = target.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
-
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth',
-      });
-    }
+    onSelectPanel(id);
+    window.scrollTo({
+      top: 140,
+      behavior: 'smooth',
+    });
   };
 
   return (
@@ -91,22 +70,26 @@ export const NavigationJumpBar: React.FC<NavigationJumpBarProps> = ({
         <div className="flex items-center justify-between overflow-x-auto py-2.5 scrollbar-none gap-2">
           <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap min-w-max">
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:inline-block mr-1">
-              Jump To:
+              Panels:
             </span>
+
+            {/* Individual Panel Buttons (Clicking shows this panel and hides the others) */}
             {navItems.map((item) => {
               const Icon = item.icon;
               const isActive = activePanel === item.id;
               return (
-                <a
+                <button
                   key={item.id}
-                  href={`#${item.id}`}
-                  onClick={(e) => handleJump(item.id, e)}
-                  aria-current={isActive ? 'true' : undefined}
-                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-1 ${
+                  type="button"
+                  id={`btn-${item.id}`}
+                  onClick={(e) => handleItemClick(item.id, e)}
+                  aria-pressed={isActive}
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-1 ${
                     isActive
-                      ? `${item.activeColor} shadow-xs`
+                      ? `${item.activeColor} shadow-xs ring-1 ring-emerald-500/40`
                       : 'text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white border-slate-200 dark:border-slate-700'
                   }`}
+                  title={`Show ${item.label} (hides other panels)`}
                 >
                   <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-current' : 'text-slate-500 dark:text-slate-400'}`} aria-hidden="true" />
                   <span>{item.label}</span>
@@ -119,9 +102,27 @@ export const NavigationJumpBar: React.FC<NavigationJumpBarProps> = ({
                   >
                     {item.badge}
                   </span>
-                </a>
+                </button>
               );
             })}
+
+            {/* All Panels (2x2 Grid View) Toggle */}
+            <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 mx-1 hidden sm:block" />
+            <button
+              type="button"
+              id="btn-panel-all"
+              onClick={(e) => handleItemClick('all', e)}
+              aria-pressed={activePanel === 'all'}
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                activePanel === 'all'
+                  ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 border-slate-900 dark:border-white shadow-xs'
+                  : 'text-slate-600 dark:text-slate-400 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700'
+              }`}
+              title="Show all 4 panels simultaneously in 2x2 grid"
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span>All Panels (Grid)</span>
+            </button>
           </div>
 
           <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 flex-shrink-0">
@@ -129,7 +130,7 @@ export const NavigationJumpBar: React.FC<NavigationJumpBarProps> = ({
               <button
                 type="button"
                 onClick={onOpenAI}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-950 bg-amber-400 hover:bg-amber-300 shadow-2xs transition-colors border border-amber-500/40 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-emerald-950 bg-amber-400 hover:bg-amber-300 shadow-2xs transition-colors border border-amber-500/40 focus:outline-none focus:ring-2 focus:ring-amber-400 cursor-pointer"
               >
                 <Bot className="w-3.5 h-3.5 text-emerald-950" />
                 <span>Ask AI (किसान सहायक)</span>
@@ -138,7 +139,7 @@ export const NavigationJumpBar: React.FC<NavigationJumpBarProps> = ({
             )}
             <span className="hidden lg:inline-flex items-center gap-1.5 text-slate-500">
               <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span>Live Auto-Calculations Enabled</span>
+              <span>{activePanel === 'all' ? '2×2 Grid Active' : 'Focused Panel Mode'}</span>
             </span>
           </div>
         </div>

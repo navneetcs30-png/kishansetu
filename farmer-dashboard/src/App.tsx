@@ -73,6 +73,9 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
   // Active farmer profile being represented in Farmer Dashboard
   const [activeFarmerId, setActiveFarmerId] = useState<string>('sub-farmer-01');
 
+  // Active panel visibility: 'panel-grains' | 'panel-vegetables' | 'panel-guidance' | 'panel-schemes' | 'all'
+  const [activePanel, setActivePanel] = useState<string>('panel-grains');
+
   // Modal visibility
   const [isVerificationModalOpen, setIsVerificationModalOpen] = useState<boolean>(false);
 
@@ -367,9 +370,11 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
             totalGrainValue={totalGrainValue}
             totalVegetableValue={totalVegetableValue}
             onOpenAI={() => setIsAIAssistantOpen(true)}
+            activePanel={activePanel}
+            onSelectPanel={setActivePanel}
           />
 
-          {/* Main 2x2 Responsive Layout Grid */}
+          {/* Main Layout Grid / Focused Panel Mode */}
           <main
             id="main-dashboard-panels"
             className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 pb-24 md:pb-12"
@@ -380,33 +385,67 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
               onOpenUploadModal={() => setIsVerificationModalOpen(true)}
             />
 
-            <div className="grid grid-cols-1 min-[880px]:grid-cols-2 gap-6 items-start">
-              {/* Panel 1: Grain & Crop Rates (MSP) */}
-              <GrainRatesPanel
-                crops={activeCrops}
-                quantities={cropQuantities}
-                onQuantityChange={handleCropQuantityChange}
-                onResetCrops={handleResetCrops}
-                isFarmerVerified={isFarmerVerified}
-              />
+            {activePanel === 'all' ? (
+              <div className="grid grid-cols-1 min-[880px]:grid-cols-2 gap-6 items-start animate-in fade-in duration-200">
+                {/* Panel 1: Grain & Crop Rates (MSP) */}
+                <GrainRatesPanel
+                  crops={activeCrops}
+                  quantities={cropQuantities}
+                  onQuantityChange={handleCropQuantityChange}
+                  onResetCrops={handleResetCrops}
+                  isFarmerVerified={isFarmerVerified}
+                />
 
-              {/* Panel 2: Vegetable Market (Mandi Rates) */}
-              <VegetableMarketPanel
-                vegetables={activeVegetables}
-                quantities={vegetableQuantities}
-                onQuantityChange={handleVegetableQuantityChange}
-                onResetVegetables={handleResetVegetables}
-              />
+                {/* Panel 2: Vegetable Market (Mandi Rates) */}
+                <VegetableMarketPanel
+                  vegetables={activeVegetables}
+                  quantities={vegetableQuantities}
+                  onQuantityChange={handleVegetableQuantityChange}
+                  onResetVegetables={handleResetVegetables}
+                />
 
-              {/* Panel 3: Production Guidance */}
-              <ProductionGuidancePanel stages={PRODUCTION_GUIDANCE_STAGES} />
+                {/* Panel 3: Production Guidance */}
+                <ProductionGuidancePanel stages={PRODUCTION_GUIDANCE_STAGES} />
 
-              {/* Panel 4: Government Schemes */}
-              <GovernmentSchemesPanel
-                schemes={activeSchemes}
-                isFarmerVerified={isFarmerVerified}
-              />
-            </div>
+                {/* Panel 4: Government Schemes */}
+                <GovernmentSchemesPanel
+                  schemes={activeSchemes}
+                  isFarmerVerified={isFarmerVerified}
+                />
+              </div>
+            ) : (
+              <div className="w-full max-w-5xl mx-auto space-y-6 animate-in fade-in duration-200">
+                {activePanel === 'panel-grains' && (
+                  <GrainRatesPanel
+                    crops={activeCrops}
+                    quantities={cropQuantities}
+                    onQuantityChange={handleCropQuantityChange}
+                    onResetCrops={handleResetCrops}
+                    isFarmerVerified={isFarmerVerified}
+                  />
+                )}
+
+                {activePanel === 'panel-vegetables' && (
+                  <VegetableMarketPanel
+                    vegetables={activeVegetables}
+                    quantities={vegetableQuantities}
+                    onQuantityChange={handleVegetableQuantityChange}
+                    onResetVegetables={handleResetVegetables}
+                  />
+                )}
+
+                {activePanel === 'panel-guidance' && (
+                  <ProductionGuidancePanel stages={PRODUCTION_GUIDANCE_STAGES} />
+                )}
+
+                {activePanel === 'panel-schemes' && (
+                  <GovernmentSchemesPanel
+                    schemes={activeSchemes}
+                    isFarmerVerified={isFarmerVerified}
+                  />
+                )}
+              </div>
+            )}
           </main>
 
           {/* Sticky Bottom Mobile Summary */}
