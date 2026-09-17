@@ -7,6 +7,7 @@ export interface CropRateItem {
   unit: string;
   description: string;
   badge?: string;
+  imageUrl?: string;
 }
 
 export interface VegetableItem {
@@ -17,6 +18,7 @@ export interface VegetableItem {
   typicalArrival: 'High' | 'Moderate' | 'Low';
   primaryMarket: string;
   seasonNote: string;
+  imageUrl?: string;
 }
 
 export interface GuidanceStage {

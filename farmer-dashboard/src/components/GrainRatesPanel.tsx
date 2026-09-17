@@ -11,6 +11,15 @@ interface GrainRatesPanelProps {
   isFarmerVerified?: boolean;
 }
 
+const CROP_FALLBACK_IMAGES: Record<string, string> = {
+  wheat: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=600&q=80',
+  rice: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80',
+  maize: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=600&q=80',
+  mustard: 'https://images.unsplash.com/photo-1508615039623-a25605d2b022?auto=format&fit=crop&w=600&q=80',
+  gram: 'https://images.unsplash.com/photo-1515543237350-b3eea1ec8082?auto=format&fit=crop&w=600&q=80',
+  bajra: 'https://images.unsplash.com/photo-1627920769842-6887c6df05ca?auto=format&fit=crop&w=600&q=80',
+};
+
 export const GrainRatesPanel: React.FC<GrainRatesPanelProps> = ({
   crops,
   quantities,
@@ -114,33 +123,57 @@ export const GrainRatesPanel: React.FC<GrainRatesPanelProps> = ({
             const qty = quantities[crop.id] || 0;
             const rowTotal = qty * crop.mspRate;
             const inputId = `grain-qty-${crop.id}`;
+            const cropImage = crop.imageUrl || CROP_FALLBACK_IMAGES[crop.id] || CROP_FALLBACK_IMAGES.wheat;
 
             return (
               <div
                 key={crop.id}
                 className="pt-3.5 first:pt-0 transition-colors group"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  {/* Crop Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-slate-900 dark:text-slate-100 text-sm">
-                        {crop.name}
-                      </span>
-                      <span className="text-xs text-slate-500 dark:text-slate-400">
-                        ({crop.hindiName})
-                      </span>
-                      <span className="text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-1.5 py-0.5 rounded">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  {/* Crop Info & Thumbnail */}
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    {/* Crop Image Thumbnail */}
+                    <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden shrink-0 border border-amber-200/90 dark:border-amber-800/70 shadow-2xs group-hover:shadow-md transition-all bg-amber-50 dark:bg-amber-950/40">
+                      <img
+                        src={cropImage}
+                        alt={crop.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        loading="lazy"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = CROP_FALLBACK_IMAGES.wheat;
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                      <span className="absolute bottom-1 left-1 text-[9px] font-bold text-white bg-black/60 backdrop-blur-xs px-1 rounded leading-tight">
                         {crop.season}
                       </span>
                     </div>
 
-                    <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1.5 flex-wrap">
-                      <span>Govt MSP:</span>
-                      <span className="font-semibold text-emerald-800 dark:text-emerald-400">
-                        {formatINR(crop.mspRate)}
-                      </span>
-                      <span className="text-slate-400 dark:text-slate-500">/ quintal (100 kg)</span>
+                    {/* Crop Details */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base tracking-tight">
+                          {crop.name}
+                        </span>
+                        <span className="text-xs text-amber-700 dark:text-amber-400 font-medium">
+                          ({crop.hindiName})
+                        </span>
+                        {crop.badge && (
+                          <span className="text-[10px] font-semibold bg-amber-100/90 dark:bg-amber-950/90 text-amber-800 dark:text-amber-300 px-1.5 py-0.5 rounded border border-amber-200 dark:border-amber-800 hidden sm:inline-block">
+                            {crop.badge}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2 flex-wrap">
+                        <span className="inline-flex items-center gap-1 font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200/80 dark:border-emerald-800/60">
+                          Govt MSP: {formatINR(crop.mspRate)}
+                        </span>
+                        <span className="text-slate-400 dark:text-slate-500 text-[11px]">
+                          / quintal (100 kg)
+                        </span>
+                      </div>
                     </div>
                   </div>
 

@@ -14,6 +14,7 @@ export const SAMPLE_CROP_MSP_RATES: CropRateItem[] = [
     unit: 'Quintal (100 kg)',
     description: 'Central pool procurement standard FAQ grain moisture < 12%',
     badge: 'Major Rabi Crop',
+    imageUrl: 'https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'rice',
@@ -24,6 +25,7 @@ export const SAMPLE_CROP_MSP_RATES: CropRateItem[] = [
     unit: 'Quintal (100 kg)',
     description: 'Grade-A variant ₹2,203/qtl. Regulated purchase at APMC mandis',
     badge: 'Staple Kharif',
+    imageUrl: 'https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'maize',
@@ -34,6 +36,7 @@ export const SAMPLE_CROP_MSP_RATES: CropRateItem[] = [
     unit: 'Quintal (100 kg)',
     description: 'Dry grain feed and industrial starch grade benchmark',
     badge: 'Coarse Grain',
+    imageUrl: 'https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'mustard',
@@ -44,6 +47,7 @@ export const SAMPLE_CROP_MSP_RATES: CropRateItem[] = [
     unit: 'Quintal (100 kg)',
     description: 'Oilseed minimum support rate; basis 42% oil content standard',
     badge: 'High Value Oilseed',
+    imageUrl: 'https://images.unsplash.com/photo-1508615039623-a25605d2b022?auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'gram',
@@ -54,6 +58,7 @@ export const SAMPLE_CROP_MSP_RATES: CropRateItem[] = [
     unit: 'Quintal (100 kg)',
     description: 'Standard FAQ desi Bengal gram procured through NAFED',
     badge: 'Pulse Support',
+    imageUrl: 'https://images.unsplash.com/photo-1515543237350-b3eea1ec8082?auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'bajra',
@@ -64,6 +69,7 @@ export const SAMPLE_CROP_MSP_RATES: CropRateItem[] = [
     unit: 'Quintal (100 kg)',
     description: 'Shree Anna millet promotion with assured purchase mechanism',
     badge: 'Nutri-Cereal',
+    imageUrl: 'https://images.unsplash.com/photo-1627920769842-6887c6df05ca?auto=format&fit=crop&w=600&q=80',
   },
 ];
 
@@ -80,6 +86,7 @@ export const SAMPLE_VEGETABLE_RATES: VegetableItem[] = [
     typicalArrival: 'High',
     primaryMarket: 'Agra / Indore Mandi',
     seasonNote: 'Jyoti & Chipsona cold storage arrivals active',
+    imageUrl: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'onion',
@@ -89,6 +96,7 @@ export const SAMPLE_VEGETABLE_RATES: VegetableItem[] = [
     typicalArrival: 'Moderate',
     primaryMarket: 'Lasalgaon / Pimpalgaon Mandi',
     seasonNote: 'Graded medium-large bulb wholesale price',
+    imageUrl: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'tomato',
@@ -98,6 +106,7 @@ export const SAMPLE_VEGETABLE_RATES: VegetableItem[] = [
     typicalArrival: 'High',
     primaryMarket: 'Kolar / Madanapalle Mandi',
     seasonNote: 'Firm red harvesting batch; perishable lot pricing',
+    imageUrl: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'cauliflower',
@@ -107,6 +116,7 @@ export const SAMPLE_VEGETABLE_RATES: VegetableItem[] = [
     typicalArrival: 'Moderate',
     primaryMarket: 'Azadpur Wholesale Mandi',
     seasonNote: 'Snowball curd quality white heads with leaves',
+    imageUrl: 'https://images.unsplash.com/photo-1568584711075-3d021a7c3ca3?auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'cabbage',
@@ -116,6 +126,7 @@ export const SAMPLE_VEGETABLE_RATES: VegetableItem[] = [
     typicalArrival: 'High',
     primaryMarket: 'Nashik / Belgaum APMC',
     seasonNote: 'Compact green heads without outer yellow leaf defects',
+    imageUrl: 'https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?auto=format&fit=crop&w=600&q=80',
   },
   {
     id: 'green_peas',
@@ -125,6 +136,7 @@ export const SAMPLE_VEGETABLE_RATES: VegetableItem[] = [
     typicalArrival: 'Low',
     primaryMarket: 'Jalandhar / Shimla Mandi',
     seasonNote: 'Sweet tender pods; premium fetched on morning auction',
+    imageUrl: 'https://images.unsplash.com/photo-1592394533824-9440e5d68530?auto=format&fit=crop&w=600&q=80',
   },
 ];
 

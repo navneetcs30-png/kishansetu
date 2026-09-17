@@ -265,6 +265,17 @@ export function queryKnowledgeBase(
     };
   }
 
+  if (q.includes('language') || q.includes('भाषा') || q.includes('बोली') || q.includes('change lang')) {
+    return {
+      action: 'OPEN_MODAL',
+      target: 'language',
+      speechReply: isHi ? 'भाषा चयन मेनू खोला जा रहा है।' : 'Opening language selection menu.',
+      displayText: isHi ? '🌐 भाषा मेनू खोला गया' : '🌐 Language Menu Opened',
+      answer: isHi ? 'भाषा चयन मेनू खोला गया है। अपनी पसंदीदा भाषा चुनें।' : 'Language selection menu opened. Please select your preferred language.',
+      executed: true,
+    };
+  }
+
   // H. Grid / All Panels View
   if (
     q.includes('grid') || q.includes('ग्रिड') || q.includes('all panel') ||
@@ -477,6 +488,25 @@ export function queryKnowledgeBase(
       answer: isHi
         ? `### 🍅 टमाटर (Tomato Cultivation & Protection)\n\n• **आज का मंडी भाव**: **₹1,850 प्रति क्विंटल** (कोलार व मदनपल्ली APMC)।\n• **उन्नत किस्में**: अभिनव हाइब्रिड, हिमसोना, पूसा रूबी, अर्का रक्षक (त्रिपल रोग प्रतिरोधी)।\n• **मरोड़िया रोग (Leaf Curl Virus)**: सफेद मक्खी द्वारा फैलता है। रोकथाम हेतु पीला चिपचिपा ट्रैप (Yellow sticky trap) लगाएं और एसिटामिप्रिड 20% SP (0.5 ग्राम/लीटर) छिड़कें।\n• **फल छेदक (Fruit Borer)**: फेरोमोन ट्रैप लगाएं और प्रोफेनोफॉस 50% EC 2 मिली/लीटर का छिड़काव करें।`
         : `### 🍅 Tomato (Solanum lycopersicum)\n\n• **Benchmark Mandi Rate**: **₹1,850 per quintal** (Kolar Mandi).\n• **High-Yield Hybrids**: Abhinav, Arka Rakshak (triple disease resistant), Himsona.\n• **Leaf Curl Virus**: Controlled by combating whiteflies with yellow sticky traps & Acetamiprid 20% SP @ 0.5 g/L.\n• **Fruit Borer**: Deploy pheromone traps; spray Chlorantraniliprole 18.5% SC @ 0.3 ml/L.`,
+      executed: true,
+    };
+  }
+
+  // G2. General Vegetable Mandi Rates
+  if (
+    q.includes('vegetable') || q.includes('सब्जी') || q.includes('mandi') ||
+    q.includes('मंडी') || q.includes('sabzi')
+  ) {
+    return {
+      action: 'FOCUS_PANEL',
+      target: 'panel-vegetables',
+      speechReply: isHi
+        ? 'सब्जी मंडी भाव: आलू ₹1,450, प्याज ₹2,100, टमाटर ₹1,850 प्रति क्विंटल। सब्जी बाजार पैनल दिखाया जा रहा है।'
+        : 'Mandi Rates: Potato ₹1,450/Q, Onion ₹2,100/Q, Tomato ₹1,850/Q. Focusing on Vegetable Market panel.',
+      displayText: isHi ? '🥬 सब्जी मंडी भाव पैनल दिखाया गया' : '🥬 Vegetable Mandi Panel Focused',
+      answer: isHi
+        ? `### 🥬 दैनिक सब्जी मंडी थोक भाव (APMC Mandi Rates)\n\n• **आलू (Agra Mandi)**: ₹1,450 / क्विंटल\n• **प्याज (Lasalgaon Mandi)**: ₹2,100 / क्विंटल\n• **टमाटर (Kolar Mandi)**: ₹1,850 / क्विंटल\n• **हरी मटर (Jabalpur Mandi)**: ₹3,600 / क्विंटल\n• **हरी मिर्च (Guntur Mandi)**: ₹4,200 / क्विंटल\n• **फूलगोभी (Hapur Mandi)**: ₹1,600 / क्विंटल`
+        : `### 🥬 Daily APMC Vegetable Mandi Wholesale Benchmarks\n\n• **Potato (Agra Mandi)**: ₹1,450 / Quintal\n• **Onion (Lasalgaon Mandi)**: ₹2,100 / Quintal\n• **Tomato (Kolar Mandi)**: ₹1,850 / Quintal\n• **Green Peas (Jabalpur Mandi)**: ₹3,600 / Quintal\n• **Green Chilli (Guntur Mandi)**: ₹4,200 / Quintal\n• **Cauliflower (Hapur Mandi)**: ₹1,600 / Quintal`,
       executed: true,
     };
   }

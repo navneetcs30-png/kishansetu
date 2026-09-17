@@ -10,6 +10,15 @@ interface VegetableMarketPanelProps {
   onResetVegetables: () => void;
 }
 
+const VEGETABLE_FALLBACK_IMAGES: Record<string, string> = {
+  potato: 'https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=600&q=80',
+  onion: 'https://images.unsplash.com/photo-1618512496248-a07fe83aa8cb?auto=format&fit=crop&w=600&q=80',
+  tomato: 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=600&q=80',
+  cauliflower: 'https://images.unsplash.com/photo-1568584711075-3d021a7c3ca3?auto=format&fit=crop&w=600&q=80',
+  cabbage: 'https://images.unsplash.com/photo-1594282486552-05b4d80fbb9f?auto=format&fit=crop&w=600&q=80',
+  green_peas: 'https://images.unsplash.com/photo-1592394533824-9440e5d68530?auto=format&fit=crop&w=600&q=80',
+};
+
 export const VegetableMarketPanel: React.FC<VegetableMarketPanelProps> = ({
   vegetables,
   quantities,
@@ -138,6 +147,7 @@ export const VegetableMarketPanel: React.FC<VegetableMarketPanelProps> = ({
             const effectiveRate = unitMode === 'quintal' ? veg.mandiRatePerQuintal : ratePerKg;
             const rowTotal = rawQty * effectiveRate;
             const inputId = `veg-qty-${veg.id}`;
+            const vegImage = veg.imageUrl || VEGETABLE_FALLBACK_IMAGES[veg.id] || VEGETABLE_FALLBACK_IMAGES.potato;
 
             const arrivalBadgeColor =
               veg.typicalArrival === 'High'
@@ -151,35 +161,53 @@ export const VegetableMarketPanel: React.FC<VegetableMarketPanelProps> = ({
                 key={veg.id}
                 className="pt-3.5 first:pt-0 transition-colors group"
               >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                  {/* Veg Details */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-semibold text-slate-900 dark:text-slate-100 text-sm">
-                        {veg.name}
-                      </span>
-                      <span className="text-xs text-slate-500 dark:text-slate-400">
-                        ({veg.hindiName})
-                      </span>
-                      <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded border ${arrivalBadgeColor}`}>
-                        {veg.typicalArrival} Arrival
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  {/* Veg Details & Thumbnail */}
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    {/* Vegetable Image Thumbnail */}
+                    <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-xl overflow-hidden shrink-0 border border-emerald-200/90 dark:border-emerald-800/70 shadow-2xs group-hover:shadow-md transition-all bg-emerald-50 dark:bg-emerald-950/40">
+                      <img
+                        src={vegImage}
+                        alt={veg.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                        loading="lazy"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = VEGETABLE_FALLBACK_IMAGES.potato;
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                      <span className={`absolute bottom-1 left-1 text-[8px] font-bold px-1 rounded leading-tight shadow-xs ${
+                        veg.typicalArrival === 'High' ? 'bg-amber-600 text-white' : 'bg-emerald-600 text-white'
+                      }`}>
+                        {veg.typicalArrival}
                       </span>
                     </div>
 
-                    <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 flex items-center gap-1.5 flex-wrap">
-                      <span>Rate:</span>
-                      <span className="font-semibold text-emerald-700 dark:text-emerald-400">
-                        {formatINR(veg.mandiRatePerQuintal)}
-                      </span>
-                      <span className="text-slate-400 dark:text-slate-500">/ qtl</span>
-                      <span className="text-slate-300 dark:text-slate-600">•</span>
-                      <span className="font-medium text-slate-600 dark:text-slate-300">
-                        (~₹{ratePerKg.toFixed(1)}/kg)
-                      </span>
-                      <span className="text-slate-300 dark:text-slate-600">•</span>
-                      <span className="text-[11px] text-slate-400 dark:text-slate-500 truncate max-w-[130px] sm:max-w-none">
-                        {veg.primaryMarket}
-                      </span>
+                    {/* Vegetable Text Meta */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-bold text-slate-900 dark:text-slate-100 text-sm sm:text-base tracking-tight">
+                          {veg.name}
+                        </span>
+                        <span className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">
+                          ({veg.hindiName})
+                        </span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded hidden sm:inline-block">
+                          {veg.primaryMarket}
+                        </span>
+                      </div>
+
+                      <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2 flex-wrap">
+                        <span className="inline-flex items-center gap-1 font-semibold text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-200/80 dark:border-emerald-800/60">
+                          Mandi: {formatINR(veg.mandiRatePerQuintal)}/qtl
+                        </span>
+                        <span className="text-slate-600 dark:text-slate-300 font-medium text-[11px]">
+                          (~₹{ratePerKg.toFixed(1)}/kg)
+                        </span>
+                        <span className="text-[11px] text-slate-400 dark:text-slate-500 sm:hidden">
+                          • {veg.primaryMarket}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
