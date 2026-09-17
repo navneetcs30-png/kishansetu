@@ -49,6 +49,12 @@ class VoiceAssistantService {
   private recognition: any = null;
   private isListeningActive: boolean = false;
   private currentUtterance: SpeechSynthesisUtterance | null = null;
+  private activeAudio: HTMLAudioElement | null = null;
+  private isNativeSpeaking: boolean = false;
+  private isAudioSpeaking: boolean = false;
+  private onSpeakStartCallback?: () => void;
+  private onSpeakEndCallback?: () => void;
+  private cachedVoices: SpeechSynthesisVoice[] = [];
   private isMuted: boolean = false;
   private speechRate: number = 1.0;
 
@@ -61,6 +67,29 @@ class VoiceAssistantService {
       if (savedMute) this.isMuted = savedMute === 'true';
       const savedRate = localStorage.getItem('kishansetu_voice_rate');
       if (savedRate) this.speechRate = parseFloat(savedRate) || 1.0;
+
+      // Pre-warm SpeechSynthesis voices if supported
+      if ('speechSynthesis' in window) {
+        try {
+          this.cachedVoices = window.speechSynthesis.getVoices();
+          window.speechSynthesis.onvoiceschanged = () => {
+            this.cachedVoices = window.speechSynthesis.getVoices();
+          };
+        } catch (e) {
+          // ignore
+        }
+      }
+
+      // Listen for Native Android TTS callbacks dispatched from AndroidNativeTTS
+      window.addEventListener('kishan_native_tts_start', () => {
+        this.isNativeSpeaking = true;
+        this.onSpeakStartCallback?.();
+      });
+
+      window.addEventListener('kishan_native_tts_end', () => {
+        this.isNativeSpeaking = false;
+        this.onSpeakEndCallback?.();
+      });
     }
   }
 
@@ -75,7 +104,21 @@ class VoiceAssistantService {
 
   public isSpeechSynthesisSupported(): boolean {
     if (typeof window === 'undefined') return false;
-    return 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+    return (
+      ('speechSynthesis' in window && 'SpeechSynthesisUtterance' in window) ||
+      !!(window as any).AndroidNativeTTS ||
+      typeof Audio !== 'undefined'
+    );
+  }
+
+  public isNativeAndroidTTSAvailable(): boolean {
+    if (typeof window === 'undefined') return false;
+    const native = (window as any).AndroidNativeTTS;
+    if (!native) return false;
+    if (typeof native.isAvailable === 'function') {
+      return native.isAvailable();
+    }
+    return true;
   }
 
   // --- API Key Management ---
@@ -206,7 +249,7 @@ class VoiceAssistantService {
     return this.isListeningActive;
   }
 
-  // --- Speech Synthesis (TTS) ---
+  // --- Speech Synthesis (TTS) Multi-Tier Execution ---
   public speak(
     text: string, 
     languageCode: string, 
@@ -217,67 +260,173 @@ class VoiceAssistantService {
 
     this.stopSpeaking();
 
-    try {
-      // Clean markdown format for natural voice reading
-      const cleanText = text
-        .replace(/[*#_`>]/g, '')
-        .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
-        .replace(/\n\s*\n/g, '. ')
-        .replace(/\n/g, '. ')
-        .trim();
+    // Clean markdown and non-verbal tokens for clean speech pronunciation
+    const cleanText = text
+      .replace(/[*#_`>]/g, '')
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/https?:\/\/\S+/g, '')
+      .replace(/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '')
+      .replace(/\n\s*\n/g, '. ')
+      .replace(/\n/g, '. ')
+      .trim();
 
-      if (!cleanText) return;
+    if (!cleanText) return;
 
-      const utterance = new SpeechSynthesisUtterance(cleanText);
-      const locale = SPEECH_LOCALE_MAP[languageCode] || 'hi-IN';
-      utterance.lang = locale;
-      utterance.rate = this.speechRate;
-      utterance.pitch = 1.0;
+    this.onSpeakStartCallback = onStart;
+    this.onSpeakEndCallback = onEnd;
 
-      // Try selecting an authentic native voice for the locale
-      const voices = window.speechSynthesis.getVoices();
-      const matchedVoice = voices.find(
-        (v) => v.lang.startsWith(locale.split('-')[0]) || v.lang === locale
-      );
-      if (matchedVoice) {
-        utterance.voice = matchedVoice;
+    const locale = SPEECH_LOCALE_MAP[languageCode] || 'hi-IN';
+
+    // Tier 1: Native Android TextToSpeech Engine (APK container / Android WebView)
+    if (typeof window !== 'undefined' && (window as any).AndroidNativeTTS?.speakText) {
+      try {
+        this.isNativeSpeaking = true;
+        onStart?.();
+        (window as any).AndroidNativeTTS.speakText(cleanText, locale, this.speechRate);
+        return;
+      } catch (err) {
+        console.warn('AndroidNativeTTS speak call failed, trying next tier:', err);
+        this.isNativeSpeaking = false;
       }
+    }
 
-      utterance.onstart = () => {
-        this.currentUtterance = utterance;
+    // Tier 2: W3C Web SpeechSynthesis API (Desktop Chrome / Safari / Edge)
+    if (
+      typeof window !== 'undefined' && 
+      'speechSynthesis' in window && 
+      'SpeechSynthesisUtterance' in window
+    ) {
+      try {
+        const utterance = new SpeechSynthesisUtterance(cleanText);
+        utterance.lang = locale;
+        utterance.rate = this.speechRate;
+        utterance.pitch = 1.0;
+
+        // Try selecting authentic native voice for the locale
+        const voices = this.cachedVoices.length > 0 ? this.cachedVoices : window.speechSynthesis.getVoices();
+        const matchedVoice = voices.find(
+          (v) => v.lang.startsWith(locale.split('-')[0]) || v.lang === locale
+        );
+        if (matchedVoice) {
+          utterance.voice = matchedVoice;
+        }
+
+        utterance.onstart = () => {
+          this.currentUtterance = utterance;
+          onStart?.();
+        };
+
+        utterance.onend = () => {
+          this.currentUtterance = null;
+          onEnd?.();
+        };
+
+        utterance.onerror = (err) => {
+          console.warn('Web SpeechSynthesis error event, trying streaming audio fallback:', err);
+          this.currentUtterance = null;
+          this.speakViaAudioFallback(cleanText, locale, onStart, onEnd);
+        };
+
+        window.speechSynthesis.speak(utterance);
+        return;
+      } catch (e) {
+        console.warn('Speech synthesis speak threw error, falling back to audio stream:', e);
+      }
+    }
+
+    // Tier 3: HTML5 Audio Stream Fallback
+    this.speakViaAudioFallback(cleanText, locale, onStart, onEnd);
+  }
+
+  private speakViaAudioFallback(
+    text: string,
+    locale: string,
+    onStart?: () => void,
+    onEnd?: () => void
+  ): void {
+    if (typeof Audio === 'undefined') {
+      onEnd?.();
+      return;
+    }
+
+    try {
+      this.stopSpeaking();
+      const lang = locale.split('-')[0] || 'hi';
+      const truncatedText = text.length > 190 ? text.substring(0, 190) : text;
+      const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${encodeURIComponent(lang)}&q=${encodeURIComponent(truncatedText)}`;
+      
+      const audio = new Audio(url);
+      this.activeAudio = audio;
+      this.isAudioSpeaking = true;
+
+      audio.onplay = () => {
         onStart?.();
       };
 
-      utterance.onend = () => {
-        this.currentUtterance = null;
+      audio.onended = () => {
+        this.isAudioSpeaking = false;
+        this.activeAudio = null;
         onEnd?.();
       };
 
-      utterance.onerror = () => {
-        this.currentUtterance = null;
+      audio.onerror = () => {
+        this.isAudioSpeaking = false;
+        this.activeAudio = null;
         onEnd?.();
       };
 
-      window.speechSynthesis.speak(utterance);
+      audio.play().catch((err) => {
+        console.warn('Audio fallback playback blocked or failed:', err);
+        this.isAudioSpeaking = false;
+        this.activeAudio = null;
+        onEnd?.();
+      });
     } catch (e) {
-      console.warn('Speech synthesis error:', e);
+      console.warn('Could not play audio fallback:', e);
       onEnd?.();
     }
   }
 
   public stopSpeaking(): void {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      try {
-        window.speechSynthesis.cancel();
-      } catch (e) {
-        // ignore
+    if (typeof window !== 'undefined') {
+      if ((window as any).AndroidNativeTTS?.stopSpeaking) {
+        try {
+          (window as any).AndroidNativeTTS.stopSpeaking();
+        } catch (e) {
+          // ignore
+        }
       }
-      this.currentUtterance = null;
+
+      if ('speechSynthesis' in window) {
+        try {
+          window.speechSynthesis.cancel();
+        } catch (e) {
+          // ignore
+        }
+        this.currentUtterance = null;
+      }
+
+      if (this.activeAudio) {
+        try {
+          this.activeAudio.pause();
+          this.activeAudio.currentTime = 0;
+        } catch (e) {
+          // ignore
+        }
+        this.activeAudio = null;
+      }
     }
+    this.isNativeSpeaking = false;
+    this.isAudioSpeaking = false;
   }
 
   public isSpeaking(): boolean {
-    return typeof window !== 'undefined' && 'speechSynthesis' in window && window.speechSynthesis.speaking;
+    if (typeof window === 'undefined') return false;
+    if (this.isNativeSpeaking) return true;
+    if ((window as any).AndroidNativeTTS?.isSpeaking?.()) return true;
+    if ('speechSynthesis' in window && window.speechSynthesis.speaking) return true;
+    if (this.isAudioSpeaking) return true;
+    return false;
   }
 
   // --- Real-time Voice Command API Caller ---
