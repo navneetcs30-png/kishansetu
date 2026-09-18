@@ -24,6 +24,8 @@ import { ContractDetailsModal } from './components/ContractDetailsModal';
 import { SchemeDetailsModal } from './components/SchemeDetailsModal';
 import { VerificationModal } from './components/VerificationModal';
 import { MobileQuickNav } from './components/MobileQuickNav';
+import { RaiseBulkDemandModal } from './components/RaiseBulkDemandModal';
+import { marketplaceService, FarmerProduct } from '../../src/services/marketplaceService';
 import { CheckCircle2, Grid2X2, Maximize2, ShieldCheck, Sparkles, X, UploadCloud } from 'lucide-react';
 
 export interface BulkBuyerAppProps {
@@ -61,6 +63,49 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: BulkBuye
       return baseComm;
     });
   }, [adminConfig.bulkBuyer.commodities]);
+
+  // Real-time Farmer Submitted Bulk Lots from KishanSetu Marketplace
+  const [farmerBulkLots, setFarmerBulkLots] = useState<FarmerProduct[]>(() => marketplaceService.getProductsForBulkBuyers());
+  const [isRaiseBulkDemandOpen, setIsRaiseBulkDemandOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleSync = () => {
+      setFarmerBulkLots(marketplaceService.getProductsForBulkBuyers());
+    };
+    const unsub = marketplaceService.subscribe(handleSync);
+    window.addEventListener('kishansetu_marketplace_updated', handleSync);
+    return () => {
+      unsub();
+      window.removeEventListener('kishansetu_marketplace_updated', handleSync);
+    };
+  }, []);
+
+  // Merged Commodities: Direct Farmer lots appear alongside FPO catalog
+  const combinedCommodities = useMemo(() => {
+    const mappedLots: Commodity[] = farmerBulkLots.map((fp) => ({
+      id: fp.id,
+      name: fp.name,
+      category: fp.category === 'Vegetables' ? 'Vegetables & Tubers' : (fp.category === 'Pulses & Seeds' || fp.category === 'Oilseeds') ? 'Pulses & Oilseeds' : 'Grains & Cereals',
+      variety: `${fp.variety} (Direct Farmer Lot)`,
+      origin: `${fp.location}, ${fp.state}`,
+      fpoSupplier: `${fp.farmerName} (Direct Farmer / FPO)`,
+      availableStockQuintals: fp.availableStockQuintals,
+      minOrderQuantity: fp.minOrderQuintals || 5,
+      grade: fp.qualityGrade,
+      harvestDate: fp.harvestDate,
+      moistureContent: '< 12% Standard',
+      basePricePerQuintal: fp.pricePerQuintal,
+      tiers: [
+        { minQty: fp.minOrderQuintals || 5, maxQty: 25, ratePerQuintal: fp.pricePerQuintal, discountPercent: 0 },
+        { minQty: 25, maxQty: 100, ratePerQuintal: Math.round(fp.pricePerQuintal * 0.96), discountPercent: 4 },
+        { minQty: 100, maxQty: undefined, ratePerQuintal: Math.round(fp.pricePerQuintal * 0.92), discountPercent: 8 },
+      ],
+      imageUrl: fp.imageUrl,
+      storageType: 'Direct Farm Gate / Mandi Platform',
+    }));
+
+    return [...mappedLots, ...activeCommodities];
+  }, [farmerBulkLots, activeCommodities]);
 
   const [contracts, setContracts] = useState<ContractOrder[]>(CONTRACT_ORDERS_DATA);
   const [topics] = useState(GUIDANCE_TOPICS_DATA);
@@ -130,7 +175,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: BulkBuye
     let baseVal = 0;
     let count = 0;
 
-    activeCommodities.forEach((c) => {
+    combinedCommodities.forEach((c) => {
       const q = quantities[c.id] || 0;
       if (q > 0) {
         count += 1;
@@ -147,7 +192,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: BulkBuye
       totalBaseValue: baseVal,
       selectedItemsCount: count,
     };
-  }, [activeCommodities, quantities]);
+  }, [combinedCommodities, quantities]);
 
   const activeContractsCount = contracts.filter((c) => c.status !== 'Delivered').length;
   const actionRequiredCount = contracts.filter((c) => !!c.actionRequired).length;
@@ -387,11 +432,12 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: BulkBuye
           <div className="w-full">
             {focusedTab === 'procurement' && (
               <ProcurementPanel
-                commodities={activeCommodities}
+                commodities={combinedCommodities}
                 quantities={quantities}
                 onQuantityChange={handleQuantityChange}
                 onRequestQuote={() => setOrderModal({ isOpen: true, mode: 'quote' })}
                 onPlaceBulkOrder={() => setOrderModal({ isOpen: true, mode: 'order' })}
+                onOpenRaiseDemand={() => setIsRaiseBulkDemandOpen(true)}
               />
             )}
             {focusedTab === 'contracts' && (
@@ -419,11 +465,12 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: BulkBuye
             {/* Panel 1: Bulk Procurement Panel */}
             <div className="w-full h-full min-h-[520px]">
               <ProcurementPanel
-                commodities={activeCommodities}
+                commodities={combinedCommodities}
                 quantities={quantities}
                 onQuantityChange={handleQuantityChange}
                 onRequestQuote={() => setOrderModal({ isOpen: true, mode: 'quote' })}
                 onPlaceBulkOrder={() => setOrderModal({ isOpen: true, mode: 'order' })}
+                onOpenRaiseDemand={() => setIsRaiseBulkDemandOpen(true)}
               />
             </div>
 
@@ -483,7 +530,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: BulkBuye
       <OrderQuoteModal
         isOpen={orderModal.isOpen}
         mode={orderModal.mode}
-        commodities={activeCommodities}
+        commodities={combinedCommodities}
         quantities={quantities}
         verification={verification}
         onClose={() => setOrderModal({ ...orderModal, isOpen: false })}
@@ -507,6 +554,14 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: BulkBuye
         onClose={() => setIsVerificationModalOpen(false)}
         verification={verification}
         onSaveVerification={handleSaveVerification}
+      />
+
+      <RaiseBulkDemandModal
+        isOpen={isRaiseBulkDemandOpen}
+        onClose={() => setIsRaiseBulkDemandOpen(false)}
+        onDemandSubmitted={(demand) => {
+          showToast(`RFQ for ${demand.commodity} (${demand.requiredQty} ${demand.unit}) broadcasted to farmers!`, 'success');
+        }}
       />
     </div>
   );

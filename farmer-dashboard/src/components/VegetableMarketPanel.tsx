@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Carrot, Info, RotateCcw, Scale } from 'lucide-react';
+import { Carrot, Info, RotateCcw, Scale, Tag } from 'lucide-react';
 import { VegetableItem } from '../types';
 import { formatINR, formatNumber } from '../utils/formatters';
 
@@ -8,6 +8,7 @@ interface VegetableMarketPanelProps {
   quantities: Record<string, number>;
   onQuantityChange: (vegId: string, value: number) => void;
   onResetVegetables: () => void;
+  onListVegetableForSale?: (veg: VegetableItem) => void;
 }
 
 const VEGETABLE_FALLBACK_IMAGES: Record<string, string> = {
@@ -24,6 +25,7 @@ export const VegetableMarketPanel: React.FC<VegetableMarketPanelProps> = ({
   quantities,
   onQuantityChange,
   onResetVegetables,
+  onListVegetableForSale,
 }) => {
   // Input unit mode: Quintals (100 kg) or Kilograms (kg)
   const [unitMode, setUnitMode] = useState<'quintal' | 'kg'>('quintal');
@@ -208,6 +210,20 @@ export const VegetableMarketPanel: React.FC<VegetableMarketPanelProps> = ({
                           • {veg.primaryMarket}
                         </span>
                       </div>
+
+                      {onListVegetableForSale && (
+                        <div className="mt-2">
+                          <button
+                            type="button"
+                            onClick={() => onListVegetableForSale(veg)}
+                            className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 px-2.5 py-1 rounded-lg border border-emerald-300 dark:border-emerald-700/60 transition cursor-pointer shadow-2xs"
+                            title={`Submit ${veg.name} to marketplace for Consumers and Bulk Buyers`}
+                          >
+                            <Tag className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                            <span>List for Sale (बाज़ार में बेचें)</span>
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
 

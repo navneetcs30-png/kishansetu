@@ -23,6 +23,7 @@ interface ProcurementPanelProps {
   onQuantityChange: (commodityId: string, quantity: number) => void;
   onRequestQuote: () => void;
   onPlaceBulkOrder: () => void;
+  onOpenRaiseDemand?: () => void;
 }
 
 export const ProcurementPanel: React.FC<ProcurementPanelProps> = ({
@@ -31,6 +32,7 @@ export const ProcurementPanel: React.FC<ProcurementPanelProps> = ({
   onQuantityChange,
   onRequestQuote,
   onPlaceBulkOrder,
+  onOpenRaiseDemand,
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -85,9 +87,23 @@ export const ProcurementPanel: React.FC<ProcurementPanelProps> = ({
             </div>
           </div>
 
-          <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-            {filteredCommodities.length} Commodities Available
-          </span>
+          <div className="flex items-center gap-2">
+            {onOpenRaiseDemand && (
+              <button
+                type="button"
+                id="btn-post-rfq-open"
+                onClick={onOpenRaiseDemand}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-700 hover:bg-emerald-800 text-white shadow-xs transition"
+                title="Post an RFQ/Demand for commodities from farmers"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Post RFQ (मांग दर्ज करें)</span>
+              </button>
+            )}
+            <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+              {filteredCommodities.length} Commodities Available
+            </span>
+          </div>
         </div>
 
         {/* Search & Category Filter Toolbar */}
@@ -175,6 +191,11 @@ export const ProcurementPanel: React.FC<ProcurementPanelProps> = ({
                           <Warehouse className="w-3 h-3 text-slate-400" />
                           {item.storageType}
                         </span>
+                        {(item.variety.includes('Direct Farmer Lot') || item.fpoSupplier.includes('Individual Farmer') || item.id.startsWith('prod-farm-')) && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700/60">
+                            👨‍🌾 Direct Farmer Lot (सीधा किसान से)
+                          </span>
+                        )}
                       </div>
 
                       <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white leading-tight">

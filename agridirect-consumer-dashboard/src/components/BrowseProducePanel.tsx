@@ -26,6 +26,7 @@ interface BrowseProducePanelProps {
   totalWeightKg: number;
   bulkDiscountAmount: number;
   finalCartAmount: number;
+  onOpenRaiseDemand?: () => void;
 }
 
 export const BrowseProducePanel: React.FC<BrowseProducePanelProps> = ({
@@ -37,16 +38,19 @@ export const BrowseProducePanel: React.FC<BrowseProducePanelProps> = ({
   subtotal,
   totalWeightKg,
   bulkDiscountAmount,
-  finalCartAmount
+  finalCartAmount,
+  onOpenRaiseDemand
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [priceUnitView, setPriceUnitView] = useState<'kg' | 'quintal'>('kg');
 
-  const categories = ['All', 'Grains', 'Vegetables', 'Pulses & Seeds'];
+  const categories = ['All', '🌾 Direct From Farmers', 'Grains', 'Vegetables', 'Pulses & Seeds'];
 
   const filteredProduce = produceList.filter((item) => {
-    const matchesCategory = selectedCategory === 'All' || item.category === selectedCategory;
+    const matchesCategory = 
+      selectedCategory === 'All' || 
+      (selectedCategory === '🌾 Direct From Farmers' ? item.variety.includes('Direct Farm Gate') || item.farmerName.includes('👨‍🌾') : item.category === selectedCategory);
     const matchesSearch =
       item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (item.hindiName && item.hindiName.includes(searchQuery)) ||
@@ -101,30 +105,46 @@ export const BrowseProducePanel: React.FC<BrowseProducePanelProps> = ({
             </p>
           </div>
 
-          {/* Unit Toggle */}
-          <div className="flex items-center bg-stone-200/80 dark:bg-slate-800 p-0.5 rounded-lg text-xs font-medium border border-stone-300 dark:border-slate-700">
-            <button
-              type="button"
-              onClick={() => setPriceUnitView('kg')}
-              className={`px-2.5 py-1 rounded-md transition-all ${
-                priceUnitView === 'kg'
-                  ? 'bg-white dark:bg-emerald-700 text-emerald-800 dark:text-white shadow-xs font-semibold'
-                  : 'text-stone-600 dark:text-slate-300 hover:text-stone-900 dark:hover:text-white'
-              }`}
-            >
-              Per kg
-            </button>
-            <button
-              type="button"
-              onClick={() => setPriceUnitView('quintal')}
-              className={`px-2.5 py-1 rounded-md transition-all ${
-                priceUnitView === 'quintal'
-                  ? 'bg-white dark:bg-emerald-700 text-emerald-800 dark:text-white shadow-xs font-semibold'
-                  : 'text-stone-600 dark:text-slate-300 hover:text-stone-900 dark:hover:text-white'
-              }`}
-            >
-              Per Quintal (100kg)
-            </button>
+          {/* Header Action & Unit Toggle */}
+          <div className="flex flex-wrap items-center gap-2">
+            {onOpenRaiseDemand && (
+              <button
+                type="button"
+                id="btn-raise-demand-open"
+                onClick={onOpenRaiseDemand}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors"
+                title="Post a demand for produce you need from farmers"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>Demand Produce (मांग दर्ज करें)</span>
+              </button>
+            )}
+
+            {/* Unit Toggle */}
+            <div className="flex items-center bg-stone-200/80 dark:bg-slate-800 p-0.5 rounded-lg text-xs font-medium border border-stone-300 dark:border-slate-700">
+              <button
+                type="button"
+                onClick={() => setPriceUnitView('kg')}
+                className={`px-2.5 py-1 rounded-md transition-all ${
+                  priceUnitView === 'kg'
+                    ? 'bg-white dark:bg-emerald-700 text-emerald-800 dark:text-white shadow-xs font-semibold'
+                    : 'text-stone-600 dark:text-slate-300 hover:text-stone-900 dark:hover:text-white'
+                }`}
+              >
+                Per kg
+              </button>
+              <button
+                type="button"
+                onClick={() => setPriceUnitView('quintal')}
+                className={`px-2.5 py-1 rounded-md transition-all ${
+                  priceUnitView === 'quintal'
+                    ? 'bg-white dark:bg-emerald-700 text-emerald-800 dark:text-white shadow-xs font-semibold'
+                    : 'text-stone-600 dark:text-slate-300 hover:text-stone-900 dark:hover:text-white'
+                }`}
+              >
+                Per Quintal (100kg)
+              </button>
+            </div>
           </div>
         </div>
 
@@ -216,6 +236,12 @@ export const BrowseProducePanel: React.FC<BrowseProducePanelProps> = ({
                         <Award className="w-3 h-3 text-amber-600 dark:text-amber-400" />
                         {item.qualityGrade}
                       </span>
+                      {(item.variety.includes('Direct Farm Gate') || item.farmerName.includes('👨‍🌾') || item.id.startsWith('prod-farm-')) && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-700/60 flex items-center gap-1">
+                          <Sparkles className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                          Direct Farm Harvest (सीधा किसान से)
+                        </span>
+                      )}
                     </div>
 
                     <p className="text-xs text-stone-600 dark:text-slate-400 mt-1 line-clamp-1">

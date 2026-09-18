@@ -6,11 +6,15 @@ import { GrainRatesPanel } from './components/GrainRatesPanel';
 import { VegetableMarketPanel } from './components/VegetableMarketPanel';
 import { ProductionGuidancePanel } from './components/ProductionGuidancePanel';
 import { GovernmentSchemesPanel } from './components/GovernmentSchemesPanel';
+import { BuyerDemandsPanel } from './components/BuyerDemandsPanel';
+import { FarmerProductSubmitModal } from './components/FarmerProductSubmitModal';
+import { FarmerMyListingsModal } from './components/FarmerMyListingsModal';
 import { MobileSummaryBar } from './components/MobileSummaryBar';
 import { FarmerVerificationModal } from './components/FarmerVerificationModal';
 import { VerificationStatusBanner } from './components/VerificationStatusBanner';
 import { AdminVerificationDesk } from './components/AdminVerificationDesk';
 import { KisanAIAssistant } from './components/KisanAIAssistant';
+import { marketplaceService, FarmerProduct } from '../../src/services/marketplaceService';
 import {
   SAMPLE_CROP_MSP_RATES,
   SAMPLE_VEGETABLE_RATES,
@@ -73,8 +77,37 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
   // Active farmer profile being represented in Farmer Dashboard
   const [activeFarmerId, setActiveFarmerId] = useState<string>('sub-farmer-01');
 
-  // Active panel visibility: 'panel-grains' | 'panel-vegetables' | 'panel-guidance' | 'panel-schemes' | 'all'
+  // Active panel visibility: 'panel-grains' | 'panel-vegetables' | 'panel-demands' | 'panel-guidance' | 'panel-schemes' | 'all'
   const [activePanel, setActivePanel] = useState<string>('panel-grains');
+
+  // Marketplace Modals State
+  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState<boolean>(false);
+  const [isMyListingsModalOpen, setIsMyListingsModalOpen] = useState<boolean>(false);
+  const [prefillSubmitData, setPrefillSubmitData] = useState<{
+    name?: string;
+    category?: 'Grains' | 'Vegetables' | 'Pulses & Seeds' | 'Fruits' | 'Oilseeds';
+    pricePerQuintal?: number;
+  } | null>(null);
+
+  // Marketplace Counts
+  const [openDemandsCount, setOpenDemandsCount] = useState<number>(() => marketplaceService.getOpenDemands().length);
+  const [myListingsCount, setMyListingsCount] = useState<number>(() => marketplaceService.getProductsByFarmer(activeFarmerId).length);
+
+  // Listen to Marketplace & Demand changes
+  useEffect(() => {
+    const updateCounts = () => {
+      setOpenDemandsCount(marketplaceService.getOpenDemands().length);
+      setMyListingsCount(marketplaceService.getProductsByFarmer(activeFarmerId).length);
+    };
+    const unsubscribe = marketplaceService.subscribe(updateCounts);
+    window.addEventListener('kishansetu_marketplace_updated', updateCounts);
+    window.addEventListener('kishansetu_demands_updated', updateCounts);
+    return () => {
+      unsubscribe();
+      window.removeEventListener('kishansetu_marketplace_updated', updateCounts);
+      window.removeEventListener('kishansetu_demands_updated', updateCounts);
+    };
+  }, [activeFarmerId]);
 
   // Listen to Global Voice Assistant Panel Selection Commands
   useEffect(() => {
@@ -83,6 +116,8 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
       if (!panel) return;
       if (panel === 'all') {
         setActivePanel('all');
+      } else if (panel.includes('demand') || panel.includes('order') || panel.includes('buyer') || panel.includes('contract')) {
+        setActivePanel('panel-demands');
       } else if (panel.includes('grain') || panel.includes('msp') || panel.includes('wheat')) {
         setActivePanel('panel-grains');
       } else if (panel.includes('veg') || panel.includes('onion') || panel.includes('potato')) {
@@ -91,6 +126,9 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
         setActivePanel('panel-guidance');
       } else if (panel.includes('scheme')) {
         setActivePanel('panel-schemes');
+      } else if (panel.includes('submit') || panel.includes('sell')) {
+        setPrefillSubmitData(null);
+        setIsSubmitModalOpen(true);
       }
     };
     window.addEventListener('kishansetu_select_panel', handleVoicePanelSelect);
@@ -102,6 +140,29 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
 
   // Kisan AI Sahayak Assistant open/close state
   const [isAIAssistantOpen, setIsAIAssistantOpen] = useState<boolean>(false);
+
+  const handleOpenSubmitCrop = (crop: any) => {
+    setPrefillSubmitData({
+      name: `${crop.name} (${crop.hindiName})`,
+      category: 'Grains',
+      pricePerQuintal: crop.mspRate,
+    });
+    setIsSubmitModalOpen(true);
+  };
+
+  const handleOpenSubmitVegetable = (veg: any) => {
+    setPrefillSubmitData({
+      name: `${veg.name} (${veg.hindiName})`,
+      category: 'Vegetables',
+      pricePerQuintal: veg.mandiRatePerQuintal,
+    });
+    setIsSubmitModalOpen(true);
+  };
+
+  const handleOpenGeneralSubmit = () => {
+    setPrefillSubmitData(null);
+    setIsSubmitModalOpen(true);
+  };
 
   // Quantities for crops (in Quintals)
   const [cropQuantities, setCropQuantities] = useState<Record<string, number>>({
@@ -381,6 +442,8 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
         onOpenAI={() => setIsAIAssistantOpen(true)}
         isDark={isDark}
         onToggleTheme={() => setIsDark((prev) => !prev)}
+        onOpenSubmitProduct={handleOpenGeneralSubmit}
+        onOpenMyListings={() => setIsMyListingsModalOpen(true)}
       />
 
       {/* View Switcher: Farmer Dashboard vs Admin Verification Desk */}
@@ -393,6 +456,10 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
             onOpenAI={() => setIsAIAssistantOpen(true)}
             activePanel={activePanel}
             onSelectPanel={setActivePanel}
+            openDemandsCount={openDemandsCount}
+            onOpenSubmitProduct={handleOpenGeneralSubmit}
+            onOpenMyListings={() => setIsMyListingsModalOpen(true)}
+            myListingsCount={myListingsCount}
           />
 
           {/* Main Layout Grid / Focused Panel Mode */}
@@ -418,7 +485,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
                     Farmer Mandi Hub & Production Desk
                   </h1>
                   <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-xl">
-                    Live government MSP rates, verified vegetable benchmarks across mandis, and direct market orders with zero middleman commission.
+                    Live government MSP rates, direct marketplace crop listings for Consumers and Bulk Buyers, and instant live Buyer Demand matching.
                   </p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
@@ -427,8 +494,8 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
                     <p className="text-xl font-extrabold text-white">6 Grains</p>
                   </div>
                   <div className="bg-white/10 dark:bg-slate-900/60 backdrop-blur-md rounded-xl p-3 border border-white/15 text-center min-w-[100px]">
-                    <p className="text-[10px] text-amber-300 uppercase font-semibold">Mandi Feeds</p>
-                    <p className="text-xl font-extrabold text-white">Live Daily</p>
+                    <p className="text-[10px] text-amber-300 uppercase font-semibold">Buyer Demands</p>
+                    <p className="text-xl font-extrabold text-amber-400">{openDemandsCount} Live</p>
                   </div>
                 </div>
               </div>
@@ -449,6 +516,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
                   onQuantityChange={handleCropQuantityChange}
                   onResetCrops={handleResetCrops}
                   isFarmerVerified={isFarmerVerified}
+                  onListCropForSale={handleOpenSubmitCrop}
                 />
 
                 {/* Panel 2: Vegetable Market (Mandi Rates) */}
@@ -457,7 +525,17 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
                   quantities={vegetableQuantities}
                   onQuantityChange={handleVegetableQuantityChange}
                   onResetVegetables={handleResetVegetables}
+                  onListVegetableForSale={handleOpenSubmitVegetable}
                 />
+
+                {/* Panel: Live Buyer Demands */}
+                <div className="min-[880px]:col-span-2">
+                  <BuyerDemandsPanel
+                    farmerName={currentFarmerSubmission?.fullName || 'Ramesh Patel'}
+                    farmerId={activeFarmerId}
+                    onOpenSubmitProduct={handleOpenGeneralSubmit}
+                  />
+                </div>
 
                 {/* Panel 3: Production Guidance */}
                 <ProductionGuidancePanel stages={PRODUCTION_GUIDANCE_STAGES} />
@@ -477,6 +555,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
                     onQuantityChange={handleCropQuantityChange}
                     onResetCrops={handleResetCrops}
                     isFarmerVerified={isFarmerVerified}
+                    onListCropForSale={handleOpenSubmitCrop}
                   />
                 )}
 
@@ -486,6 +565,15 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
                     quantities={vegetableQuantities}
                     onQuantityChange={handleVegetableQuantityChange}
                     onResetVegetables={handleResetVegetables}
+                    onListVegetableForSale={handleOpenSubmitVegetable}
+                  />
+                )}
+
+                {activePanel === 'panel-demands' && (
+                  <BuyerDemandsPanel
+                    farmerName={currentFarmerSubmission?.fullName || 'Ramesh Patel'}
+                    farmerId={activeFarmerId}
+                    onOpenSubmitProduct={handleOpenGeneralSubmit}
                   />
                 )}
 
@@ -544,7 +632,28 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: FarmerAp
         onToggle={() => setIsAIAssistantOpen((prev) => !prev)}
       />
 
+      {/* Farmer Produce Submit Modal */}
+      <FarmerProductSubmitModal
+        isOpen={isSubmitModalOpen}
+        onClose={() => setIsSubmitModalOpen(false)}
+        farmerName={currentFarmerSubmission?.fullName || 'Ramesh Patel'}
+        farmerId={activeFarmerId}
+        initialCropName={prefillSubmitData?.name}
+        initialCategory={prefillSubmitData?.category}
+        initialPricePerQuintal={prefillSubmitData?.pricePerQuintal}
+        onSuccess={() => {
+          setOpenDemandsCount(marketplaceService.getOpenDemands().length);
+          setMyListingsCount(marketplaceService.getProductsByFarmer(activeFarmerId).length);
+        }}
+      />
 
+      {/* Farmer My Active Listings Modal */}
+      <FarmerMyListingsModal
+        isOpen={isMyListingsModalOpen}
+        onClose={() => setIsMyListingsModalOpen(false)}
+        farmerId={activeFarmerId}
+        onOpenSubmitNew={handleOpenGeneralSubmit}
+      />
     </div>
   );
 }

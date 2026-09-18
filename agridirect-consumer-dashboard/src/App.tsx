@@ -16,6 +16,8 @@ import { OffersSchemesPanel } from './components/OffersSchemesPanel';
 import { CheckoutModal } from './components/CheckoutModal';
 import { SchemeDetailModal } from './components/SchemeDetailModal';
 import { ReceiptModal } from './components/ReceiptModal';
+import { RaiseConsumerDemandModal } from './components/RaiseConsumerDemandModal';
+import { marketplaceService, FarmerProduct } from '../../src/services/marketplaceService';
 import { CheckCircle2, AlertCircle, LayoutGrid, Layers, Info } from 'lucide-react';
 
 export interface ConsumerAppProps {
@@ -50,6 +52,47 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: Consumer
       return baseItem;
     });
   }, [adminConfig.consumer.produce]);
+
+  // Real-time Farmer Submitted Products from KishanSetu Marketplace
+  const [farmerProducts, setFarmerProducts] = useState<FarmerProduct[]>(() => marketplaceService.getProductsForConsumers());
+  const [isRaiseDemandOpen, setIsRaiseDemandOpen] = useState(false);
+
+  useEffect(() => {
+    const handleSync = () => {
+      setFarmerProducts(marketplaceService.getProductsForConsumers());
+    };
+    const unsub = marketplaceService.subscribe(handleSync);
+    window.addEventListener('kishansetu_marketplace_updated', handleSync);
+    return () => {
+      unsub();
+      window.removeEventListener('kishansetu_marketplace_updated', handleSync);
+    };
+  }, []);
+
+  // Merged Catalog: Fresh Farmer-Submitted items appear at top of Consumer Store
+  const combinedProduceList = useMemo(() => {
+    const mappedFarmerItems: ProduceItem[] = farmerProducts.map((fp) => ({
+      id: fp.id,
+      name: fp.name,
+      hindiName: fp.hindiName,
+      category: fp.category === 'Vegetables' ? 'Vegetables' : (fp.category === 'Pulses & Seeds' ? 'Pulses & Seeds' : 'Grains'),
+      variety: `${fp.variety} • Direct Farm Gate`,
+      pricePerKg: fp.pricePerKg,
+      pricePerQuintal: fp.pricePerQuintal,
+      farmerName: fp.farmerName,
+      location: fp.location,
+      distanceKm: 28,
+      harvestedDate: fp.harvestDate,
+      qualityGrade: fp.qualityGrade,
+      stockKg: fp.availableStockKg,
+      minOrderKg: fp.minOrderKg,
+      popular: true,
+      organic: fp.organic ?? false,
+      description: fp.description,
+    }));
+
+    return [...mappedFarmerItems, ...activeProduceList];
+  }, [farmerProducts, activeProduceList]);
 
   const [orders, setOrders] = useState<CustomerOrder[]>(INITIAL_CUSTOMER_ORDERS);
   const [cartQuantities, setCartQuantities] = useState<Record<string, number>>({
@@ -94,7 +137,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: Consumer
     for (const [prodId, rawQty] of Object.entries(cartQuantities)) {
       const qty = Number(rawQty) || 0;
       if (qty > 0) {
-        const item = activeProduceList.find((p) => p.id === prodId);
+        const item = combinedProduceList.find((p) => p.id === prodId);
         if (item) {
           rawSubtotal += qty * item.pricePerKg;
           weight += qty;
@@ -125,7 +168,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: Consumer
       finalCartAmount: finalAmount,
       cartItemCount: itemCount
     };
-  }, [cartQuantities, activeProduceList, adminConfig.consumer.rules]);
+  }, [cartQuantities, combinedProduceList, adminConfig.consumer.rules]);
 
   // Update quantity handler
   const handleUpdateQuantity = (produceId: string, quantity: number) => {
@@ -271,7 +314,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: Consumer
             {/* Panel 1: Browse & Buy Produce */}
             <div className="h-full min-h-[560px]">
               <BrowseProducePanel
-                produceList={activeProduceList}
+                produceList={combinedProduceList}
                 cartQuantities={cartQuantities}
                 onUpdateQuantity={handleUpdateQuantity}
                 onClearCart={handleClearCart}
@@ -280,6 +323,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: Consumer
                 totalWeightKg={totalWeightKg}
                 bulkDiscountAmount={bulkDiscountAmount}
                 finalCartAmount={finalCartAmount}
+                onOpenRaiseDemand={() => setIsRaiseDemandOpen(true)}
               />
             </div>
 
@@ -309,7 +353,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: Consumer
           <div className="w-full max-w-5xl mx-auto animate-in fade-in duration-200 space-y-6">
             {activeSection === 'panel-produce' && (
               <BrowseProducePanel
-                produceList={activeProduceList}
+                produceList={combinedProduceList}
                 cartQuantities={cartQuantities}
                 onUpdateQuantity={handleUpdateQuantity}
                 onClearCart={handleClearCart}
@@ -318,6 +362,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: Consumer
                 totalWeightKg={totalWeightKg}
                 bulkDiscountAmount={bulkDiscountAmount}
                 finalCartAmount={finalCartAmount}
+                onOpenRaiseDemand={() => setIsRaiseDemandOpen(true)}
               />
             )}
 
@@ -355,7 +400,7 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: Consumer
       <CheckoutModal
         isOpen={isCheckoutOpen}
         onClose={() => setIsCheckoutOpen(false)}
-        produceList={activeProduceList}
+        produceList={combinedProduceList}
         cartQuantities={cartQuantities}
         subtotal={subtotal}
         bulkDiscountAmount={bulkDiscountAmount}
@@ -372,6 +417,18 @@ export default function App({ currentUser, onSignOut, onSwitchModule }: Consumer
       <ReceiptModal
         order={viewingReceiptOrder}
         onClose={() => setViewingReceiptOrder(null)}
+      />
+
+      <RaiseConsumerDemandModal
+        isOpen={isRaiseDemandOpen}
+        onClose={() => setIsRaiseDemandOpen(false)}
+        onDemandSubmitted={(demand) => {
+          setNotification({
+            message: `🎉 Your demand for ${demand.commodity} (${demand.requiredQty} ${demand.unit}) has been broadcasted to farmers!`,
+            type: 'success',
+          });
+          setTimeout(() => setNotification(null), 6000);
+        }}
       />
     </div>
   );

@@ -23,6 +23,8 @@ interface HeaderProps {
   onOpenAI?: () => void;
   isDark?: boolean;
   onToggleTheme?: () => void;
+  onOpenSubmitProduct?: () => void;
+  onOpenMyListings?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -32,6 +34,8 @@ export const Header: React.FC<HeaderProps> = ({
   farmerSubmission,
   onOpenVerificationModal,
   onOpenAI,
+  onOpenSubmitProduct,
+  onOpenMyListings,
 }) => {
   const { t } = useLanguage();
   const grandTotal = totalGrainValue + totalVegetableValue;
@@ -138,6 +142,19 @@ export const Header: React.FC<HeaderProps> = ({
                 <RefreshCw className="w-3.5 h-3.5" />
               </button>
             </div>
+
+            {/* Quick List Produce Action */}
+            {onOpenSubmitProduct && (
+              <button
+                type="button"
+                onClick={onOpenSubmitProduct}
+                className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-sm transition-all cursor-pointer border border-emerald-400/40"
+                title="Submit produce for sale directly to Consumers and Bulk Buyers"
+              >
+                <FileUp className="w-3.5 h-3.5" />
+                <span>+ List Produce</span>
+              </button>
+            )}
 
             {/* Kisan AI Assistant Trigger */}
             {onOpenAI && (

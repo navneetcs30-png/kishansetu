@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wheat, Info, RotateCcw, Plus, Sparkles } from 'lucide-react';
+import { Wheat, Info, RotateCcw, Plus, Sparkles, Tag } from 'lucide-react';
 import { CropRateItem } from '../types';
 import { formatINR, formatNumber } from '../utils/formatters';
 
@@ -9,6 +9,7 @@ interface GrainRatesPanelProps {
   onQuantityChange: (cropId: string, value: number) => void;
   onResetCrops: () => void;
   isFarmerVerified?: boolean;
+  onListCropForSale?: (crop: CropRateItem) => void;
 }
 
 const CROP_FALLBACK_IMAGES: Record<string, string> = {
@@ -26,6 +27,7 @@ export const GrainRatesPanel: React.FC<GrainRatesPanelProps> = ({
   onQuantityChange,
   onResetCrops,
   isFarmerVerified,
+  onListCropForSale,
 }) => {
   // Calculate subtotal for grain sales
   const totalGrainValue = crops.reduce((sum, crop) => {
@@ -174,6 +176,20 @@ export const GrainRatesPanel: React.FC<GrainRatesPanelProps> = ({
                           / quintal (100 kg)
                         </span>
                       </div>
+
+                      {onListCropForSale && (
+                        <div className="mt-2">
+                          <button
+                            type="button"
+                            onClick={() => onListCropForSale(crop)}
+                            className="inline-flex items-center gap-1.5 text-[11px] font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 px-2.5 py-1 rounded-lg border border-emerald-300 dark:border-emerald-700/60 transition cursor-pointer shadow-2xs"
+                            title={`Submit ${crop.name} to marketplace for Consumers and Bulk Buyers`}
+                          >
+                            <Tag className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+                            <span>List for Sale (बाज़ार में बेचें)</span>
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
 

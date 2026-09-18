@@ -10,7 +10,7 @@ export interface ProduceItem {
   location: string;
   distanceKm: number;
   harvestedDate: string;
-  qualityGrade: 'Grade A+' | 'Grade A' | 'Organic Certified';
+  qualityGrade: 'Grade A+' | 'Grade A' | 'Organic Certified' | 'Agmark Premium';
   stockKg: number;
   minOrderKg: number;
   popular?: boolean;

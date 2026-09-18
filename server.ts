@@ -6,6 +6,7 @@ import { GoogleGenAI } from '@google/genai';
 import { createServer as createViteServer } from 'vite';
 import { platformDb } from './src/server/db';
 import { supabaseService } from './src/server/supabaseService';
+import { marketplaceService } from './src/services/marketplaceService';
 
 dotenv.config();
 
@@ -740,6 +741,95 @@ app.get('/api/data/mandi-rates', async (_req, res) => {
     res.json(result);
   } catch (err: any) {
     res.status(500).json({ error: 'Failed to retrieve mandi rates.' });
+  }
+});
+
+// ==========================================
+// 🌾 BIDIRECTIONAL MARKETPLACE & DEMAND ENDPOINTS
+// ==========================================
+
+// 8. Get All Farmer-Listed Products (with optional target audience filter)
+app.get('/api/marketplace/products', (req, res) => {
+  try {
+    const audience = req.query.audience as string;
+    if (audience === 'consumer') {
+      res.json(marketplaceService.getProductsForConsumers());
+    } else if (audience === 'bulk_buyer') {
+      res.json(marketplaceService.getProductsForBulkBuyers());
+    } else {
+      res.json(marketplaceService.getProducts());
+    }
+  } catch (err: any) {
+    res.status(500).json({ error: 'Failed to retrieve marketplace products.' });
+  }
+});
+
+// 9. Submit a New Farmer Produce Listing
+app.post('/api/marketplace/products', (req, res) => {
+  try {
+    const productData = req.body;
+    if (!productData || !productData.name || !productData.pricePerKg) {
+      res.status(400).json({ error: 'Missing required produce name or pricing.' });
+      return;
+    }
+    const created = marketplaceService.submitProduct(productData);
+    res.status(201).json(created);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Failed to submit produce listing.' });
+  }
+});
+
+// 10. Get All Buyer Demands (Consumer & Bulk Buyer requests)
+app.get('/api/marketplace/demands', (req, res) => {
+  try {
+    const openOnly = req.query.open === 'true';
+    if (openOnly) {
+      res.json(marketplaceService.getOpenDemands());
+    } else {
+      res.json(marketplaceService.getDemands());
+    }
+  } catch (err: any) {
+    res.status(500).json({ error: 'Failed to retrieve buyer demands.' });
+  }
+});
+
+// 11. Raise a New Buyer Demand (Consumer or Bulk Buyer)
+app.post('/api/marketplace/demands', (req, res) => {
+  try {
+    const demandData = req.body;
+    if (!demandData || !demandData.commodity || !demandData.requiredQty) {
+      res.status(400).json({ error: 'Missing required commodity name or required quantity.' });
+      return;
+    }
+    const created = marketplaceService.raiseDemand(demandData);
+    res.status(201).json(created);
+  } catch (err: any) {
+    res.status(500).json({ error: 'Failed to post buyer demand.' });
+  }
+});
+
+// 12. Fulfill a Buyer Demand by Farmer
+app.post('/api/marketplace/demands/:id/fulfill', (req, res) => {
+  try {
+    const demandId = req.params.id;
+    const { farmerId, farmerName, committedQty, committedRate } = req.body;
+    if (!farmerName || !committedQty) {
+      res.status(400).json({ error: 'Missing farmer information or committed quantity.' });
+      return;
+    }
+    const success = marketplaceService.fulfillDemand(demandId, {
+      farmerId: farmerId || 'sub-farmer-01',
+      farmerName,
+      committedQty: Number(committedQty),
+      committedRate: Number(committedRate),
+    });
+    if (!success) {
+      res.status(404).json({ error: 'Demand not found or could not be fulfilled.' });
+      return;
+    }
+    res.json({ success: true, message: 'Demand successfully committed by farmer.' });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Failed to fulfill demand.' });
   }
 });
 
